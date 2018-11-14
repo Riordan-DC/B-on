@@ -1,15 +1,15 @@
-[submodule "lib/glfw"]
+[submodule "Beon/libs/glfw"]
 	path = Beon/libs/glfw
 	url = https://github.com/glfw/glfw.git
-[submodule "lib/glad"]
+[submodule "Beon/libs/glad"]
 	path = Beon/libs/glad
 	url = https://github.com/Dav1dde/glad.git
-[submodule "lib/bullet3"]
+[submodule "Beon/libs/bullet3"]
 	path = Beon/libs/bullet3
 	url = https://github.com/bulletphysics/bullet3.git
-[submodule "lib/stb"]
+[submodule "Beon/libs/stb"]
 	path = Beon/libs/stb
 	url = https://github.com/nothings/stb.git
-[submodule "lib/glm"]
+[submodule "Beon/libs/glm"]
 	path = Beon/libs/glm
 	url = https://github.com/g-truc/glm.git
