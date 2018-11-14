@@ -1,117 +1,127 @@
-#ifndef PLANE
-#define PLANE
-#include <glm/gtc/matrix_transform.hpp>
-#include <vector>
-#include "VertexBuffer.hpp"
 
-class Plane{
-	public:
-		Plane();
-		void Draw(Shader &shader);
-		void Move(float x, float y, float z);
-		void Move(glm::vec4 _pos);
-		unsigned int VBO;
-		unsigned int VAO;
-		unsigned int EBO;
-
-		VertexBuffer vb;
-
-		glm::vec3 scale;
-		glm::vec3 pos;
-		glm::vec3 axis;
-		float angle;
-		float x, y, z;
-
-		GLuint vertexbuffer;
-		std::vector<float> vertices;
-		std::vector<unsigned int> indices;
-
+/////TEST STRUCT//////
+struct VERT_NORM{
+    glm::vec3 vert;
+    glm::vec3 norm;
+    VERT_NORM(glm::vec3 v, glm::vec3 n){
+        vert = v;
+        norm = n;
+    }
 };
 
-void Plane::Move(float x, float y, float z)
+Shader mShader = Shader("shaders/TransformVertexShader.vert", "shaders/TextureFragmentShader.frag");
+//Shader mShader = Shader("StandardShading.vertexshader", "StandardShading.fragmentshader" );
+
+
+
+// Read our .obj file
+std::vector<unsigned short> indices;
+std::vector< glm::vec3 > vertices;
+//std::vector< glm::vec2 > uvs;
+std::vector< glm::vec3 > normals; // Won't be used at the moment.
+//Warning, loadAssImp will load all the models pieces into differently indexed places. Each must be rendered individually
+//otherwise only the first one will be rendered. I.E. USe a VAO
+
+std::cout << vertices.size() << std::endl;
+
+std::vector<VERT_NORM> data_test;
+for(int i = 0; i<vertices.size(); i++)
 {
-	pos.x = x;
-	pos.y = y;
-	pos.z = z;
+    VERT_NORM datum(vertices[i], normals[i]);
+    data_test.push_back(datum);
 }
 
-void Plane::Move(glm::vec4 _pos)
-{
-	pos = _pos;
-}
+VertexArray va;
+VertexBuffer vb(&data_test[0],  vertices.size() * sizeof(glm::vec3) * 2);
+//VertexBuffer nb(&normals[0],  normals.size() * sizeof(glm::vec3));
+//IndexBuffer ib(&indices[0], indices.size());
 
-void Plane::Draw(Shader &shader)
-{
 
-	shader.use();
-	glm::mat4 model(1.0);
-	/*
-	glm::mat4 translation = glm::translate(model, glm::vec3(pos.x, pos.y, pos.z));
-	glm::mat4 rotation = glm::rotate(model, angle, axis);
-	glm::mat4 scaling = glm::scale(model, scale);
+VertexBufferLayout layout;
+layout.Push_FLOAT(3);
+layout.Push_FLOAT(3);
+va.AddBuffer(vb, layout);
+//va.AddBuffer(nb, layout);
 
-	model = translation * rotation * scaling;
-	*/
-	shader.setMat4("model", model);
+/* Buffer structure: [position, normal]
+ * Both position and normal are sizeof(glm::vec3).
+ * This means position is offset by 0 and
+ * normal is offset by sizeof(glm::vec3).
+ */
+/*
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3) * 2, NULL);
+glEnableVertexAttribArray(0);
 
-	vb.Bind();
-	glDrawArrays(GL_TRIANGLES, 0, 4 * 3);
-	glBindVertexArray(0);
+// normal attribute
+glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3) * 2, (void*)(sizeof(glm::vec3)));
+glEnableVertexAttribArray(1);
 
-}
+*/
 
-Plane::Plane(){
-	scale = glm::vec3(1.0f, 1.0f, 1.0f);
-	pos = glm::vec4(glm::vec3(0.f, 0.f, 0.0f), 1.0);
-	axis = glm::vec3(1.0f, 0.0f, 0.0f);
-	angle = 0;
+mShader.use();
+//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//Plane plane;
+//GLuint LightID = glGetUniformLocation(mShader.ID, "LightPosition_worldspace");
 
-	//std::vector< glm::vec3 > vertices;
-	//std::vector< glm::vec3 > vertices;
-    vertices = {
-         0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
-    };
-    indices = {  // note that we start from 0!
-        0, 1, 3,   // first triangle
-        1, 2, 3    // second triangle
-    };
-    
 
-    vb.Build(&vertices[0], vertices.size() * sizeof(float) * 3);
+// Game Loop //
+while (glfwWindowShouldClose(window) == false && running) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 
+    getDeltaTime();
+    updateController(window, deltaTime);
+    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     /*
-    //glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    //glBindVertexArray(VAO);
-	
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
+    mShader.use();
+    updateCamera(mShader);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0], GL_STATIC_DRAW);
+    //plane.Draw(mShader);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glEnableVertexAttribArray(0);
+    glm::mat4 model(1.0);
+    mShader.setMat4("M", model);
 
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
+    //glm::vec3 lightPos = glm::vec3(4,4,4);
+    //mShader.setVec3("LightPosition_worldspace", lightPos.x, lightPos.y, lightPos.z);
 
-    // remember: do NOT unbind the IBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    //glBindVertexArray(0); 
-
-    // uncomment this call to draw in wireframe polygons.
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    va.Bind();
+    
+    //glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    glBindVertexArray(0);
     */
+
+    /////////////////////////////
+    mShader.use();
+    updateCamera(mShader);
+
+    //plane.Draw(mShader);
+
+    glm::mat4 model2(1.0);
+    model2 = glm::translate(model2, glm::vec3(5.0,0.0,0.0));
+    mShader.setMat4("M", model2);
+
+    //glm::vec3 lightPos = glm::vec3(4,4,4);
+    //mShader.setVec3("LightPosition_worldspace", lightPos.x, lightPos.y, lightPos.z);
+    crysis.Draw(mShader);
+    //va.Bind();
+    
+    //glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    //glDrawArrays(GL_TRIANGLES, 0, vertices.size() * 2);
+    //glBindVertexArray(0);
+    ////////////////////////////////
+    // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+    glfwSwapBuffers(window);
+    glfwPollEvents();
 }
 
-#endif
+// optional: de-allocate all resources once they've outlived their purpose:
+//glDeleteVertexArrays(1, &VAO);
+//glDeleteBuffers(1, &VBO);
+//glDeleteBuffers(1, &EBO);
+
+cleanup();
+return 0;
+
