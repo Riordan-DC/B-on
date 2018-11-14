@@ -1,15 +1,24 @@
-[submodule "Beon/libs/glfw"]
-	path = Beon/libs/glfw
-	url = https://github.com/glfw/glfw.git
+[submodule "Beon/libs/assimp"]
+        path = Beon/libs/assimp
+            url = https://github.com/assimp/assimp.git
+                branch = master
 [submodule "Beon/libs/glad"]
-	path = Beon/libs/glad
-	url = https://github.com/Dav1dde/glad.git
-[submodule "Beon/libs/bullet3"]
-	path = Beon/libs/bullet3
-	url = https://github.com/bulletphysics/bullet3.git
-[submodule "Beon/libs/stb"]
-	path = Beon/libs/stb
-	url = https://github.com/nothings/stb.git
+        path = Beon/libs/glad
+            url = https://github.com/Dav1dde/glad.git
+                branch = c
+[submodule "Beon/libs/glfw"]
+        path = Beon/libs/glfw
+            url = https://github.com/glfw/glfw.git
+                branch = master
 [submodule "Beon/libs/glm"]
-	path = Beon/libs/glm
-	url = https://github.com/g-truc/glm.git
+        path = Beon/libs/glm
+            url = https://github.com/g-truc/glm.git
+                branch = master
+[submodule "Beon/libs/stb"]
+        path = Beon/libs/stb
+            url = https://github.com/nothings/stb.git
+                branch = master
+[submodule "Beon/libs/bullet"]
+        path = Beon/libs/bullet
+            url = https://github.com/bulletphysics/bullet3.git
+                branch = master
