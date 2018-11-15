@@ -1,9 +1,6 @@
 [submodule "Beon/libs/assimp"]
 	path = Beon/libs/assimp
 	url = https://github.com/assimp/assimp.git
-[submodule "Beon/libs/glad"]
-	path = Beon/libs/glad
-	url = https://github.com/Dav1dde/glad.git
 [submodule "Beon/libs/glfw"]
 	path = Beon/libs/glfw
 	url = https://github.com/glfw/glfw.git
