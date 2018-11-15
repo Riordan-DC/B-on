@@ -10,6 +10,9 @@
 [submodule "Beon/libs/stb"]
 	path = Beon/libs/stb
 	url = https://github.com/nothings/stb.git
-[submodule "Beon/libs/bullet3"]
-	path = Beon/libs/bullet3
+[submodule "Beon/libs/--force"]
+	path = Beon/libs/--force
+	url = https://github.com/bulletphysics/bullet3.git
+[submodule "Beon/libs/bullet"]
+	path = Beon/libs/bullet
 	url = https://github.com/bulletphysics/bullet3.git
