@@ -67,7 +67,7 @@ void getDeltaTime(){
     }
 }
 
-// #define WINDOWS  /* uncomment this line to use it for windows.*/ 
+#define WINDOWS  /* uncomment this line to use it for windows.*/ 
 #ifdef WINDOWS
 #include <direct.h>
 #define GetCurrentDir _getcwd

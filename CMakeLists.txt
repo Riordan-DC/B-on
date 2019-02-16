@@ -35,7 +35,7 @@ include_directories(Beon/headers/
                     Beon/libs/glfw/include/
                     Beon/libs/glm/
                     Beon/libs/stb/
-                    Beon/include
+                    Beon/assets
                     Beon/shaders)
 
 file(GLOB libsS_SOURCES Beon/libs/glad/src/glad.c)

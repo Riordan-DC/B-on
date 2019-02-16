@@ -8,7 +8,7 @@
 
 static bool running = true;
 
-//define functions
+//forward declaration of functions
 void cleanup();
 void render(const VertexBuffer& vb, const IndexBuffer& ib, Shader& shader);
 
@@ -26,13 +26,12 @@ int main()
 
     Render MainView(&camera, mWidth, mHeight);
 
+    Shader mShader = Shader("../Beon/shaders/CodeMaterialShader.vert", "../Beon/shaders/CodeMaterialShader.frag");
+    Shader mCubmap = Shader("../Beon/shaders/CubeMap.vert", "../Beon/shaders/CubeMap.frag" );
 
-    Shader mShader = Shader("shaders/CodeMaterialShader.vert", "shaders/CodeMaterialShader.frag");
-    Shader mCubmap = Shader("shaders/CubeMap.vert", "shaders/CubeMap.frag" );
-
-    Model cube(GetCurrentWorkingDir()+"/cube.obj", false);
+    Model cube(GetCurrentWorkingDir()+"/../Beon/assets/models/cube.obj", false);
     Model skybox;
-    skybox.LoadSkyBox(GetCurrentWorkingDir()+"/skybox");
+    skybox.LoadSkyBox(GetCurrentWorkingDir()+"/../Beon/assets/skybox");
     mShader.use();
     mShader.setInt("skybox", 0);
 
@@ -195,6 +194,10 @@ int main()
     //glDeleteVertexArrays(1, &VAO);
     //glDeleteBuffers(1, &VBO);
     //glDeleteBuffers(1, &EBO);
+	for (int i = 0; i < box_count; i++)
+	{
+		delete objects[i];
+	}
 
     cleanup();
     return 0;
