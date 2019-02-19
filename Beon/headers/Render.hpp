@@ -1,6 +1,8 @@
-#ifndef RENDER_H
-#define RENDER_H
+#ifndef RENDERER_H
+#define RENDERER_H
+
 #pragma once
+
 #include "camera.hpp"
 #include "Shader.hpp"
 
@@ -10,7 +12,6 @@ public:
 	int viewWidth;
 	int viewHeight;
 
-	
 	Render(Camera *camera, int viewWidth, int viewHeight){
 		this->camera = camera;
 		this->viewWidth = viewWidth;

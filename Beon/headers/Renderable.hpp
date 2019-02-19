@@ -1,11 +1,14 @@
-//Renderable Object
 #ifndef RENDERABLE_H
 #define RENDERABLE_H
+
 #pragma once
+
 #include <map>
 #include <string>
 
 #include "Shader.hpp"
+
+// This needs to be virtual or abstract. We dont want another object in our Object class?
 
 class Renderable{
 public:
@@ -18,9 +21,9 @@ public:
 		this->shader = Shader();
 	}
 
-	void AddShader(std::string name, Shader shader){
-		this->shaders[name] = &shader;
-		this->shader = shader;
+	void AddShader(std::string name, Shader _shader){
+		this->shaders[name] = &_shader;
+		this->shader = _shader;
 	}
 
 	Shader* GetShader(std::string name){

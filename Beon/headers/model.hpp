@@ -1,7 +1,8 @@
 //Temp
 #ifndef MODEL_H
 #define MODEL_H
-//#pragma once
+
+#pragma once
 
 #include <glad/glad.h> 
 

@@ -2,7 +2,7 @@
 #include "beon.hpp"
 #include "Shader.hpp"
 #include "CameraController.hpp"
-#include "Object.cpp"
+#include "Object.hpp"
 #include "Render.hpp"
 #include "Model.hpp"
 
@@ -10,11 +10,10 @@ static bool running = true;
 
 //forward declaration of functions
 void cleanup();
-void render(const VertexBuffer& vb, const IndexBuffer& ib, Shader& shader);
 
 WindowManager* Manager = WindowManager::getInstance();
 
-int main()
+int main(int argc, char* argv[])
 {
     if(Manager->initWindow("Beon", mWidth, mHeight) == -1){
         std::cout << "Window failed to initialize." << std::endl;
@@ -48,10 +47,10 @@ int main()
     Object crysis(cube);
     crysis.AddShader("basic", mShader);
 
-    Object plane(cube);
-    plane.AddShader("basic", mShader);
+    Object* static_cube = new Object(cube);
+	static_cube->AddShader("basic", mShader);
 
-    int box_count = 100;
+    int box_count = 10;
 
     std::vector<Object*> objects;
     for(int i = 0; i < box_count; i++){
@@ -63,7 +62,7 @@ int main()
     }
     mShader.use();
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    //Plane plane;
+	//Get a handle on our light
     //GLuint LightID = glGetUniformLocation(mShader.ID, "LightPosition_worldspace");
 
 
@@ -85,17 +84,16 @@ int main()
     crysis.InitPhysics(dynamicsWorld);
     crysis.SetPosition(glm::vec3(0.0,10.0,0.0));
     crysis.ApplyForce(glm::vec3(0.0,30.0,0.0), glm::vec3(0.0,5.0,0.0));
-    plane.mass = 0.0;
-    plane.InitPhysics(dynamicsWorld);
-    plane.SetPosition(glm::vec3(0.0, -10.0,0.0));
+	static_cube->mass = 0.0;
+	static_cube->InitPhysics(dynamicsWorld);
+	static_cube->SetPosition(glm::vec3(0.0, -10.0,0.0));
 
 
     for(int i = 0; i < box_count; i++){
         objects[i]->mass = 10.0;
         objects[i]->InitPhysics(dynamicsWorld);
         objects[i]->SetPosition(glm::vec3(0.0,(i*5)+10.0,0.0));
-        objects[i]->ApplyForce(glm::vec3(rand()%300, rand()%300, rand()%300), glm::vec3(rand()%20, rand()%20, rand()%20));
-        //printf("OBJECT %s SET!\n", objects[i]->name.c_str());
+        objects[i]->ApplyForce(glm::vec3(rand()%300, rand()%300, rand()%300), glm::vec3(0.f,0.f,0.f));
     }
 
     // Game Loop //
@@ -105,36 +103,28 @@ int main()
 
         getDeltaTime();
         updateController(window, deltaTime);
-        dynamicsWorld->stepSimulation(1.0/60.0);
+        dynamicsWorld->stepSimulation(
+			deltaTime,						// Time since last step
+			1,								// Mas substep count
+			btScalar(1.) / btScalar(60.));	// Fixed time step 
 
 
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        
-
         MainView.Update();
         MainView.UpdateShader(mShader);
         
         glm::vec3 lightColor;
-        lightColor.x = sin(glfwGetTime() * 2.0f);
-        lightColor.y = sin(glfwGetTime() * 0.7f);
-        lightColor.z = sin(glfwGetTime() * 1.3f);
+        lightColor.x = sin(glfwGetTime() * 2.0);
+        lightColor.y = sin(glfwGetTime() * 0.7);
+        lightColor.z = sin(glfwGetTime() * 1.3);
 
         mShader.setVec3("dirLight.direction", lightColor);
         mShader.setVec3("dirLight.ambient", lightColor);
         mShader.setVec3("dirLight.diffuse", lightColor);
         mShader.setVec3("dirLight.specular", lightColor);
-        // point light 1
-        /*
-        mShader.setVec3("pointLights[0].position", camera.Position);
-        mShader.setVec3("pointLights[0].ambient", 1.f, 1.f, 1.f);
-        mShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
-        mShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-        mShader.setFloat("pointLights[0].constant", 1.0f);
-        mShader.setFloat("pointLights[0].linear", 0.09);
-        mShader.setFloat("pointLights[0].quadratic", 0.032);
-        */
+
         // spotLight
         mShader.setBool("spotLight.On", true);
         mShader.setVec3("spotLight.position", camera.Position);
@@ -143,42 +133,21 @@ int main()
         mShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
         mShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
         mShader.setFloat("spotLight.constant", 1.0f);
-        mShader.setFloat("spotLight.linear", 0.09);
-        mShader.setFloat("spotLight.quadratic", 0.032);
+        mShader.setFloat("spotLight.linear", 0.09f);
+        mShader.setFloat("spotLight.quadratic", 0.032f);
         mShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
         mShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));   
         
-        /*
-        // light properties
-        glm::vec3 lightColor;
-        lightColor.x = sin(glfwGetTime() * 2.0f);
-        lightColor.y = sin(glfwGetTime() * 0.7f);
-        lightColor.z = sin(glfwGetTime() * 1.3f);
-        glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); // decrease the influence
-        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
-        mShader.setVec3("light.ambient", glm::vec3(1.0, 1.0,1.0));
-        mShader.setVec3("light.diffuse", glm::vec3(1.0, 1.0,1.0));
-        mShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        */
-
         crysis.Update(deltaTime);
-        crysis.Render(MainView);
+        crysis.RenderObject(MainView);
 
         for(int i = 0; i < box_count; i++){
             objects[i]->Update(deltaTime);
-            objects[i]->Render(MainView);
+            objects[i]->RenderObject(MainView);
         }
 
-        plane.Update(deltaTime);
-        plane.Render(MainView);
-
-        //printf("OBJECT CRYSI POS (%f, %f, %f)\n", crysis.Position.x, crysis.Position.y, crysis.Position.z);
-        //printf("OBJECT %s AT POS (%f, %f, %f)\n", objects[0]->name.c_str(), objects[0]->Position.x, objects[0]->Position.y, objects[0]->Position.z);
-
-
-        //glm::vec3 lightPos = glm::vec3(4,4,4);
-        //mShader.setVec3("LightPosition_worldspace", lightPos.x, lightPos.y, lightPos.z);
-        //crysis.Draw(mShader);
+		static_cube->Update(deltaTime);
+		static_cube->RenderObject(MainView);
 
         glDepthFunc(GL_LEQUAL);
         MainView.UpdateShader(mCubmap);
@@ -190,27 +159,45 @@ int main()
         glfwPollEvents();
     }
 
-    // optional: de-allocate all resources once they've outlived their purpose:
-    //glDeleteVertexArrays(1, &VAO);
-    //glDeleteBuffers(1, &VBO);
-    //glDeleteBuffers(1, &EBO);
+    // de-allocate all resources once they've outlived their purpose:
 	for (int i = 0; i < box_count; i++)
 	{
 		delete objects[i];
 	}
+	delete static_cube;
+	
+	for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
+	{
+		btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
+		btRigidBody* body = btRigidBody::upcast(obj);
+		if (body && body->getMotionState()) {
+			delete body->getMotionState();
+		}
+		dynamicsWorld->removeCollisionObject(obj);
+		delete obj;
+	}
+
+	// de-allocate bullet physics
+	delete dynamicsWorld;
+	
+	delete solver;
+	delete broadphase;
+	delete dispatcher;
+
+	delete collisionConfiguration;
+	
+	
 
     cleanup();
     return 0;
 }
 
-//void render(const VertexBuffer& vb, const IndexBuffer& ib, Shader& shader){
-//
-//}
-
 void cleanup()
 {
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
+	
+	delete Manager;
 }
 
 

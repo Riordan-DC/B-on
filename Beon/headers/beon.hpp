@@ -1,7 +1,13 @@
 #ifndef BEON
 #define BEON
+
 #pragma once
 
+/*
+	Todo:
+		- Wrap these globally scoped variables in a namespace for their use at
+		the entry point.
+*/
 
 // GLAD Headers
 #include <glad/glad.h>
@@ -43,8 +49,8 @@ using namespace glm;
 #include <vector>
 
 // timing
-float deltaTime = 0.0f; // time between current frame and last frame
-float lastTime = 0.0f;
+double deltaTime = 0.0f; // time between current frame and last frame
+double lastTime = 0.0f;
 
 //Frames per second counter
 double lastFrame = glfwGetTime();

@@ -1,7 +1,9 @@
+#ifndef CAMERA_CONTROLLER_HPP
+#define CAMERA_CONTROLLER_HPP
+
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include "camera.hpp"
-
 
 unsigned int SCR_WIDTH;
 unsigned int SCR_HEIGHT;
@@ -101,3 +103,5 @@ void InitController(GLFWwindow* window, int screenWidth, int screenHeight){
     lastX = SCR_HEIGHT / 2.0f;
     lastY = SCR_WIDTH / 2.0f;
 }
+
+#endif

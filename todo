@@ -3,14 +3,9 @@ todo: rio
 - Mesh loader
 - Shader loader
 
-- add git modules support for dependencies
-- build main.hpp and main.cpp
-- build makefile
-- connect asset loaders
-- create asset loader class to group loaders for in engine object creation
-- connect physics engine
-- create physics objects class
-- camera motion
+- build logging system
+- set more assertions
+- code review
 
 
 future dependents
