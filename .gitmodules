@@ -16,4 +16,6 @@
 [submodule "Beon/libs/bullet"]
 	path = Beon/libs/bullet
 	url = https://github.com/bulletphysics/bullet3.git
- [submodule "Beon/libs/imgui"] path = Beon/libs/imgui url = https://github.com/ocornut/imgui.git
+[submodule "Beon/libs/imgui"]
+	path = Beon/libs/imgui
+	url = https://github.com/ocornut/imgui.git
