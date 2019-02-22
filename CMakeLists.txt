@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(Beon)
 
+find_package(OpenGL REQUIRED)
+
 option(GLFW_BUILD_DOCS OFF)
 option(GLFW_BUILD_EXAMPLES OFF)
 option(GLFW_BUILD_TESTS OFF)
@@ -33,12 +35,20 @@ include_directories(Beon/headers/
                     Beon/libs/bullet/src/
                     Beon/libs/glad/include/
                     Beon/libs/glfw/include/
+                    Beon/libs/imgui/
+                    Beon/libs/imgui/examples/
                     Beon/libs/glm/
                     Beon/libs/stb/
                     Beon/assets
                     Beon/shaders)
 
-file(GLOB libsS_SOURCES Beon/libs/glad/src/glad.c)
+file(GLOB GLAD_SOURCES Beon/libs/glad/src/glad.c)
+file(GLOB IMGUI_SOURCES Beon/libs/imgui/*.h
+						Beon/libs/imgui/*.cpp
+						Beon/libs/imgui/examples/imgui_impl_opengl3.h
+						Beon/libs/imgui/examples/imgui_impl_opengl3.cpp
+						Beon/libs/imgui/examples/imgui_impl_glfw.h
+						Beon/libs/imgui/examples/imgui_impl_glfw.cpp)
 file(GLOB PROJECT_HEADERS Beon/headers/*.hpp)
 file(GLOB PROJECT_SOURCES Beon/src/*.cpp)
 file(GLOB PROJECT_SHADERS Beon/shaders/*.comp
@@ -54,7 +64,8 @@ file(GLOB PROJECT_CONFIGS CMakeLists.txt
 source_group("headers" FILES ${PROJECT_HEADERS})
 source_group("shaders" FILES ${PROJECT_SHADERS})
 source_group("src" FILES ${PROJECT_SOURCES})
-source_group("libs" FILES ${libsS_SOURCES})
+source_group("glad" FILES ${GLAD_SOURCES})
+source_group("imgui" FILES ${IMGUI_SOURCES})
 
 file( COPY ${CMAKE_CURRENT_SOURCE_DIR}/Beon/shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Beon)
 
@@ -62,7 +73,7 @@ add_definitions(-DGLFW_INCLUDE_NONE
                 -DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
-                               ${libsS_SOURCES})
+                               ${GLAD_SOURCES} ${IMGUI_SOURCES})
 target_link_libraries(${PROJECT_NAME} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                       BulletDynamics BulletCollision LinearMath)

@@ -12,12 +12,24 @@
 // GLAD Headers
 #include <glad/glad.h>
 
-//Local 
+// Local 
 #include "WindowManager.hpp"
 #include "VertexBuffer.hpp"
 #include "VertexArray.hpp"
 #include "VertexBufferLayout.hpp"
 #include "IndexBuffer.hpp"
+
+#include "beon.hpp"
+#include "Shader.hpp"
+#include "CameraController.hpp"
+#include "Object.hpp"
+#include "Render.hpp"
+#include "Model.hpp"
+
+// Imgui
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 // Include GLM
 #include <glm/glm.hpp>
@@ -48,13 +60,13 @@ using namespace glm;
 #include <stdlib.h>
 #include <vector>
 
-// timing
+// Timing
 double deltaTime = 0.0f; // time between current frame and last frame
 double lastTime = 0.0f;
 
-//Frames per second counter
+// Frames per second counter
 double lastFrame = glfwGetTime();
-int nbFrames = 0;
+unsigned int nbFrames = 0;
 double printTimer = 4; //Print FPS every 4 seconds
 
 
@@ -73,7 +85,7 @@ void getDeltaTime(){
     }
 }
 
-#define WINDOWS  /* uncomment this line to use it for windows.*/ 
+#define WINDOWS  /* uncomment this line to use it for windows. Comment it to use for MacOS */ 
 #ifdef WINDOWS
 #include <direct.h>
 #define GetCurrentDir _getcwd

@@ -2,22 +2,20 @@
 #include <iostream>
 #include <string>
 
-//Defaults
-const int mWidth = 800;
-const int mHeight = 600;
+// Defaults
+const int WINDOW_WIDTH = 1980/2;
+const int WINDOW_HEIGHT = 1080/2;
 const std::string programName = "Beon Engine";
 
 class WindowManager{
 	public:
 		static WindowManager* getInstance();
 		GLFWwindow* getWindow();
-		int initWindow(std::string name = programName, int width = mWidth, int height = mHeight);
-		void setWindowDimensions(int width, int height);
-
+		int initWindow(std::string name = programName, int width = WINDOW_WIDTH, int height = WINDOW_HEIGHT);
 
 		std::string mProgramName = programName;
-		int width = mWidth;
-		int height = mHeight;
+		int width = WINDOW_WIDTH;
+		int height = WINDOW_HEIGHT;
 
 	private:
 		static WindowManager* instance;
@@ -28,8 +26,7 @@ class WindowManager{
 
 WindowManager* WindowManager::instance = 0;
 
-WindowManager* WindowManager::getInstance()
-{
+WindowManager* WindowManager::getInstance() {
 	if(instance == 0){
 		instance = new WindowManager();
 	}
@@ -37,7 +34,7 @@ WindowManager* WindowManager::getInstance()
 	return instance;
 }
 
-GLFWwindow* WindowManager::getWindow(){
+GLFWwindow* WindowManager::getWindow() {
 	if(window == NULL){
 		std::cout << "[x] Window not initialized. Call function 'initWindow(std::string name, int width, int height) with defaults. '\n" << std::endl;
 		WindowManager::initWindow();
@@ -45,7 +42,7 @@ GLFWwindow* WindowManager::getWindow(){
 	return window;
 }
 
-int WindowManager::initWindow(std::string name, int width, int height){
+int WindowManager::initWindow(std::string name, int width, int height) {
 	this->mProgramName = name;
 	this->width = width;
 	this->height = height;
@@ -78,7 +75,7 @@ int WindowManager::initWindow(std::string name, int width, int height){
     
     // Set the mouse at the center of the screen
     glfwPollEvents();
-    glfwSetCursorPos(window, mWidth/2, mHeight/2);
+    glfwSetCursorPos(window, WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
 
 
     // Enable depth test
@@ -97,7 +94,7 @@ int WindowManager::initWindow(std::string name, int width, int height){
 }
 
 
-WindowManager::WindowManager(){
+WindowManager::WindowManager() {
 	// Initialise GLFW and configure
     if( !glfwInit() )
     {

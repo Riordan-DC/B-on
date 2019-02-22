@@ -1,33 +1,60 @@
 // Local Headers
 #include "beon.hpp"
-#include "Shader.hpp"
-#include "CameraController.hpp"
-#include "Object.hpp"
-#include "Render.hpp"
-#include "Model.hpp"
+
+// Window parameters
+int windowWidth = 1980 / 2;
+int windowHeight = 1080 / 2;
+
 
 static bool running = true;
 
-//forward declaration of functions
+// Forward declaration of functions
 void cleanup();
+inline void GUI(void);
+bool show_demo_window = true;
+bool show_another_window = false;
+ImVec4 example_colour = ImVec4(0, 0, 0, 0);
 
+// Create window manager
 WindowManager* Manager = WindowManager::getInstance();
 
 int main(int argc, char* argv[])
 {
-    if(Manager->initWindow("Beon", mWidth, mHeight) == -1){
+    if(Manager->initWindow("Beon", windowWidth, windowHeight) == -1){
         std::cout << "Window failed to initialize." << std::endl;
         return -1;
     };
 
+	// Get window from window manager
     GLFWwindow* window = Manager->getWindow();
-    InitController(window, mWidth, mHeight);
 
-    Render MainView(&camera, mWidth, mHeight);
+	// Initalise camera controls
+    InitController(window, windowWidth, windowHeight);
 
+	// Create render view with camera
+    Render MainView(&camera, windowWidth, windowHeight);
+
+	// Initalise Imgui
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
+
+
+	// Setup Platform/Renderer bindings
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 130");
+
+	// Load shaders
     Shader mShader = Shader("../Beon/shaders/CodeMaterialShader.vert", "../Beon/shaders/CodeMaterialShader.frag");
     Shader mCubmap = Shader("../Beon/shaders/CubeMap.vert", "../Beon/shaders/CubeMap.frag" );
 
+	// Load models
     Model cube(GetCurrentWorkingDir()+"/../Beon/assets/models/cube.obj", false);
     Model skybox;
     skybox.LoadSkyBox(GetCurrentWorkingDir()+"/../Beon/assets/skybox");
@@ -101,6 +128,11 @@ int main(int argc, char* argv[])
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
 
+		// Start the Dear ImGui frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
         getDeltaTime();
         updateController(window, deltaTime);
         dynamicsWorld->stepSimulation(
@@ -153,7 +185,9 @@ int main(int argc, char* argv[])
         MainView.UpdateShader(mCubmap);
         //skybox.DrawSkyBox(mShader);
         skybox.DrawSkyBox(mCubmap);
-        
+
+		GUI();
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -166,27 +200,31 @@ int main(int argc, char* argv[])
 	}
 	delete static_cube;
 	
-	for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
-	{
-		btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
-		btRigidBody* body = btRigidBody::upcast(obj);
-		if (body && body->getMotionState()) {
-			delete body->getMotionState();
-		}
-		dynamicsWorld->removeCollisionObject(obj);
-		delete obj;
-	}
+
 
 	// de-allocate bullet physics
-	delete dynamicsWorld;
 	
-	delete solver;
-	delete broadphase;
-	delete dispatcher;
+	//for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
+	//{
+	//	btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
+	//	btRigidBody* body = btRigidBody::upcast(obj);
+	//	if (body && body->getMotionState()) {
+	//		delete body->getMotionState();
+	//	}
+	//	dynamicsWorld->removeCollisionObject(obj);
+	//	delete obj;
+	//}
+	//delete dynamicsWorld;
+	//delete solver;
+	//delete broadphase;
+	//delete dispatcher;
+	//delete collisionConfiguration;
+	
 
-	delete collisionConfiguration;
-	
-	
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
 
     cleanup();
     return 0;
@@ -201,3 +239,45 @@ void cleanup()
 }
 
 
+inline void GUI(void) {
+	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+	if (show_demo_window)
+		ImGui::ShowDemoWindow(&show_demo_window);
+
+	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+	{
+		static float f = 0.0f;
+		static int counter = 0;
+
+		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+		ImGui::Checkbox("Another Window", &show_another_window);
+
+		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+		ImGui::ColorEdit3("clear color", (float*)&example_colour); // Edit 3 floats representing a color
+
+		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+			counter++;
+		ImGui::SameLine();
+		ImGui::Text("counter = %d", counter);
+
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
+	}
+
+	// 3. Show another simple window.
+	if (show_another_window)
+	{
+		ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+		ImGui::Text("Hello from another window!");
+		if (ImGui::Button("Close Me"))
+			show_another_window = false;
+		ImGui::End();
+	}
+
+	// Rendering
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
