@@ -1,11 +1,22 @@
-todo: rio
+todo:
 
-- Mesh loader
-- Shader loader
+When you press space I want to toggle the control of the mouse, 
+between tracking the view of the camera and free pointing to the GUI. It will
+need to talk to the window system also which will enable and disable visability of the
+pointer and allow  for infinite movement.
 
-- build logging system
-- set more assertions
-- code review
+Build logging system. Add more logging states.
+
+define some strong assertions to prevent mistakes early on.
+
+Better shader class. With better logging.
+
+Better garbage collection and control.
+
+
+
+
+
 
 
 future dependents
@@ -16,3 +27,4 @@ future dependents
 - std (texture loader)
 - glfw (window/input control)
 - glm (linear algebra)
+- imgui (gui)

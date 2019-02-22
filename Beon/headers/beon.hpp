@@ -19,12 +19,11 @@
 #include "VertexBufferLayout.hpp"
 #include "IndexBuffer.hpp"
 
-#include "beon.hpp"
 #include "Shader.hpp"
-#include "CameraController.hpp"
 #include "Object.hpp"
 #include "Render.hpp"
 #include "Model.hpp"
+#include "CameraController.hpp"
 
 // Imgui
 #include "imgui.h"

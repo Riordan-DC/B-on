@@ -1,19 +1,25 @@
 // Local Headers
-#include "beon.hpp"
+#include "Beon.hpp"
 
 // Window parameters
 int windowWidth = 1980 / 2;
 int windowHeight = 1080 / 2;
 
-
 static bool running = true;
 
 // Forward declaration of functions
+// GLFW Call back functions
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void toggle_mouse_tracking(GLFWwindow* window, int key, int scancode, int action, int mods);
+
 void cleanup();
+
+// GUI stuff
 inline void GUI(void);
 bool show_demo_window = true;
 bool show_another_window = false;
-ImVec4 example_colour = ImVec4(0, 0, 0, 0);
+ImVec4 lightColor = ImVec4(0, 0, 0, 0);
 
 // Create window manager
 WindowManager* Manager = WindowManager::getInstance();
@@ -26,13 +32,18 @@ int main(int argc, char* argv[])
     };
 
 	// Get window from window manager
-    GLFWwindow* window = Manager->getWindow();
+	GLFWwindow* window = Manager->getWindow();
 
 	// Initalise camera controls
-    InitController(window, windowWidth, windowHeight);
+	CameraController controlled_cam(window);
 
 	// Create render view with camera
-    Render MainView(&camera, windowWidth, windowHeight);
+	Render MainView(controlled_cam.camera, windowWidth, windowHeight);
+
+	// Set GLFW call backs
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetKeyCallback(window, toggle_mouse_tracking);
 
 	// Initalise Imgui
 	IMGUI_CHECKVERSION();
@@ -43,8 +54,6 @@ int main(int argc, char* argv[])
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
-	//ImGui::StyleColorsClassic();
-
 
 	// Setup Platform/Renderer bindings
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -77,7 +86,9 @@ int main(int argc, char* argv[])
     Object* static_cube = new Object(cube);
 	static_cube->AddShader("basic", mShader);
 
-    int box_count = 10;
+	int floor_width = 10;
+	int floor_length = 10;
+    int box_count = floor_width * floor_length;
 
     std::vector<Object*> objects;
     for(int i = 0; i < box_count; i++){
@@ -115,12 +126,13 @@ int main(int argc, char* argv[])
 	static_cube->InitPhysics(dynamicsWorld);
 	static_cube->SetPosition(glm::vec3(0.0, -10.0,0.0));
 
-
-    for(int i = 0; i < box_count; i++){
-        objects[i]->mass = 10.0;
-        objects[i]->InitPhysics(dynamicsWorld);
-        objects[i]->SetPosition(glm::vec3(0.0,(i*5)+10.0,0.0));
-        objects[i]->ApplyForce(glm::vec3(rand()%300, rand()%300, rand()%300), glm::vec3(0.f,0.f,0.f));
+    for(int i = 0; i < floor_width; i++){
+		for (int j = 0; j < floor_length; j++) {
+			int index = (i*floor_length) + j;
+			objects[index]->mass = 0.0;
+			objects[index]->InitPhysics(dynamicsWorld);
+			objects[index]->SetPosition(glm::vec3((j * 3), 0.0, (i * 3)));
+		}
     }
 
     // Game Loop //
@@ -134,7 +146,7 @@ int main(int argc, char* argv[])
 		ImGui::NewFrame();
 
         getDeltaTime();
-        updateController(window, deltaTime);
+		controlled_cam.Update(deltaTime);
         dynamicsWorld->stepSimulation(
 			deltaTime,						// Time since last step
 			1,								// Mas substep count
@@ -144,23 +156,23 @@ int main(int argc, char* argv[])
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        MainView.Update();
+        MainView.Update(deltaTime);
         MainView.UpdateShader(mShader);
         
-        glm::vec3 lightColor;
-        lightColor.x = sin(glfwGetTime() * 2.0);
-        lightColor.y = sin(glfwGetTime() * 0.7);
-        lightColor.z = sin(glfwGetTime() * 1.3);
+        
+        //lightColor.x = sin(glfwGetTime() * 2.0);
+        //lightColor.y = sin(glfwGetTime() * 0.7);
+        //lightColor.z = sin(glfwGetTime() * 1.3);
 
-        mShader.setVec3("dirLight.direction", lightColor);
-        mShader.setVec3("dirLight.ambient", lightColor);
-        mShader.setVec3("dirLight.diffuse", lightColor);
-        mShader.setVec3("dirLight.specular", lightColor);
+        mShader.setVec3("dirLight.direction", glm::vec3(lightColor.x, lightColor.y, lightColor.z));
+        mShader.setVec3("dirLight.ambient", glm::vec3(lightColor.x, lightColor.y, lightColor.z));
+        mShader.setVec3("dirLight.diffuse", glm::vec3(lightColor.x, lightColor.y, lightColor.z));
+        mShader.setVec3("dirLight.specular", glm::vec3(lightColor.x, lightColor.y, lightColor.z));
 
         // spotLight
         mShader.setBool("spotLight.On", true);
-        mShader.setVec3("spotLight.position", camera.Position);
-        mShader.setVec3("spotLight.direction", camera.Front);
+        mShader.setVec3("spotLight.position", controlled_cam.camera->Position);
+        mShader.setVec3("spotLight.direction", controlled_cam.camera->Front);
         mShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
         mShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
         mShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
@@ -238,7 +250,6 @@ void cleanup()
 	delete Manager;
 }
 
-
 inline void GUI(void) {
 	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 	if (show_demo_window)
@@ -256,7 +267,7 @@ inline void GUI(void) {
 		ImGui::Checkbox("Another Window", &show_another_window);
 
 		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-		ImGui::ColorEdit3("clear color", (float*)&example_colour); // Edit 3 floats representing a color
+		ImGui::ColorEdit3("clear color", (float*)&lightColor); // Edit 3 floats representing a color
 
 		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
 			counter++;
@@ -280,4 +291,19 @@ inline void GUI(void) {
 	// Rendering
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	// make sure the viewport matches the new window dimensions; note that width and 
+	// height will be significantly larger than specified on retina displays.
+	glViewport(0, 0, width, height);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+
 }

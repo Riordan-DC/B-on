@@ -18,7 +18,7 @@ public:
 		this->viewHeight = viewHeight;
 	}
 	
-	void Update(){
+	void Update(double deltaTime){
 		this->camera->UpdateCamera(this->viewWidth, this->viewHeight);
 	}
 

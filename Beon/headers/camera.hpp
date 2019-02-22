@@ -43,6 +43,7 @@ public:
     float MovementSpeed;
     float MouseSensitivity;
     float Zoom;
+	bool userControlled;
 
     glm::mat4 ProjectionMatrix;
     glm::mat4 ViewMatrix;
@@ -54,6 +55,7 @@ public:
         WorldUp = up;
         Yaw = yaw;
         Pitch = pitch;
+		this->userControlled = true;
         updateCameraVectors();
     }
     // Constructor with scalar values
@@ -63,6 +65,7 @@ public:
         WorldUp = glm::vec3(upX, upY, upZ);
         Yaw = yaw;
         Pitch = pitch;
+		this->userControlled = true;
         updateCameraVectors();
     }
 
@@ -109,7 +112,6 @@ public:
             Position -= Right * velocity;
         if (direction == RIGHT)
             Position += Right * velocity;
-        //printf("%f %f %f\n", Position.x, Position.y, Position.z);
     }
 
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.

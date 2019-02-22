@@ -13,9 +13,14 @@ class WindowManager{
 		GLFWwindow* getWindow();
 		int initWindow(std::string name = programName, int width = WINDOW_WIDTH, int height = WINDOW_HEIGHT);
 
+		void hideMouse(void);
+		void showMouse(void);
+
 		std::string mProgramName = programName;
 		int width = WINDOW_WIDTH;
 		int height = WINDOW_HEIGHT;
+
+		bool mouseVisable = false;
 
 	private:
 		static WindowManager* instance;
@@ -70,8 +75,11 @@ int WindowManager::initWindow(std::string name, int width, int height) {
     
     // Ensure we can capture the escape key being pressed below
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-    // Hide the mouse and enable unlimited mouvement
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	if (this->mouseVisable) {
+		// Hide the mouse and enable unlimited mouvement
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
     
     // Set the mouse at the center of the screen
     glfwPollEvents();
@@ -93,7 +101,6 @@ int WindowManager::initWindow(std::string name, int width, int height) {
     return 0;
 }
 
-
 WindowManager::WindowManager() {
 	// Initialise GLFW and configure
     if( !glfwInit() )
@@ -112,5 +119,14 @@ WindowManager::WindowManager() {
 #endif
 }
 
+void WindowManager::showMouse(void) {
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	this->mouseVisable = true;
+}
+
+void WindowManager::hideMouse(void) {
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	this->mouseVisable = false;
+}
 
 
