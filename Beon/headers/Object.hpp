@@ -8,6 +8,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 #include <math.h>
 #include <btBulletDynamicsCommon.h>
 
@@ -21,6 +23,7 @@ class Object: public Renderable{
 		glm::mat4 ModelMatrix;
 		glm::vec3 Position;
 		glm::quat Orientation;
+		glm::mat4 Scale;
 		std::string name;
 
 		float mass;
@@ -36,6 +39,7 @@ class Object: public Renderable{
 		void Translate(glm::vec3 pos);
 		void ApplyForce(glm::vec3 force, glm::vec3 rel_pos);
 		void InitPhysics(btDiscreteDynamicsWorld* dynamicsWorld);
+		void SetScale(float scaleFactor);
 
 	private:
 		Model* ObjectModel;

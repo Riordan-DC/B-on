@@ -9,6 +9,7 @@ Object::Object(Model model) {
 	this->Position = glm::vec3(0.0, 0.0, 0.0);
 	this->boxCollisionShape = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
 	this->Orientation = glm::quat(glm::vec3(0, 45, 0));
+	this->Scale = glm::scale(glm::vec3(1.0));
 	this->mass = 1.0;
 }
 
@@ -18,6 +19,7 @@ Object::Object(std::string path) {
 	this->Position = glm::vec3(0.0, 0.0, 0.0);
 	this->boxCollisionShape = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f)); //Future: We want to load an object collision model. 
 	this->Orientation = glm::quat(glm::vec3(0, 45, 0));
+	this->Scale = glm::scale(glm::vec3(1.0));
 	this->mass = 1.0;
 }
 
@@ -62,7 +64,7 @@ void Object::Update(float deltaTime) {
 	RotationMatrix[3][3] = 1.0f;
 
 	this->Position = glm::vec3(this->rigidBody->getCenterOfMassPosition().x(), this->rigidBody->getCenterOfMassPosition().y(), this->rigidBody->getCenterOfMassPosition().z());
-	this->ModelMatrix = glm::translate(glm::mat4(1.0), this->Position) * glm::toMat4(this->Orientation);
+	this->ModelMatrix = glm::translate(glm::mat4(1.0), this->Position) * glm::toMat4(this->Orientation) * this->Scale;
 }
 
 void Object::RenderObject(Render &render) {
@@ -75,7 +77,6 @@ void Object::RenderObject(Render &render) {
 void Object::SetPosition(glm::vec3 pos) {
 	btTransform	transform(btQuaternion(), btVector3(btScalar(pos.x), btScalar(pos.y), btScalar(pos.z)));
 	this->rigidBody->setCenterOfMassTransform(transform);
-
 }
 
 void Object::Translate(glm::vec3 pos) {
@@ -104,7 +105,11 @@ void Object::InitPhysics(btDiscreteDynamicsWorld* dynamicsWorld) {
 	this->rigidBody->setCenterOfMassTransform(tr);
 }
 
-
 void Object::LoadModel(std::string const &path) {
 	this->ObjectModel = new Model(path, false);
+}
+
+void Object::SetScale(float scaleFactor) {
+	this->boxCollisionShape->setLocalScaling(btVector3(scaleFactor, scaleFactor, scaleFactor));
+	this->Scale = glm::scale(glm::vec3(scaleFactor));
 }

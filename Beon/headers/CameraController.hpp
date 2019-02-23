@@ -5,12 +5,11 @@
 
 #include <GLFW/glfw3.h>
 
-
 #include "Camera.hpp"
 
 class CameraController {
 public:
-	CameraController(GLFWwindow* window);
+	CameraController(GLFWwindow* window, glm::vec3 cameraPosition);
 	~CameraController();
 
 	Camera* camera;

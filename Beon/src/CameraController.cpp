@@ -1,9 +1,10 @@
 #include "CameraController.hpp"
 
-CameraController::CameraController(GLFWwindow* window) {
+CameraController::CameraController(GLFWwindow* window, glm::vec3 cameraPosition) {
 	this->window = window;
-	this->camera = new Camera(glm::vec3(-0.178233, -0.471922, 28.753202));
+	this->camera = new Camera(cameraPosition);
 	this->trackMouse = true;
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 CameraController::~CameraController() {
@@ -11,8 +12,6 @@ CameraController::~CameraController() {
 }
 
 void CameraController::Update(double deltaTime) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		this->camera->ProcessKeyboard(FORWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -22,8 +21,18 @@ void CameraController::Update(double deltaTime) {
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		this->camera->ProcessKeyboard(RIGHT, deltaTime);
 
-	//if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-	//	trackMouse = !trackMouse;
+
+	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
+		// Tab has been pressed. Stop tracking the mouse and disable infinite movement.
+		if (this->trackMouse) { 
+			this->trackMouse = false;
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
+		else {
+			this->trackMouse = true;
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		}
+		
 
 	if (this->trackMouse) {
 		glfwGetCursorPos(this->window, &this->xpos, &this->ypos);
@@ -42,5 +51,8 @@ void CameraController::Update(double deltaTime) {
 		this->lastY = this->ypos;
 
 		this->camera->ProcessMouseMovement(xoffset, yoffset);
+	}
+	else {
+		this->firstMouse = true;
 	}
 }

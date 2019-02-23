@@ -3,12 +3,6 @@
 
 #pragma once
 
-/*
-	Todo:
-		- Wrap these globally scoped variables in a namespace for their use at
-		the entry point.
-*/
-
 // GLAD Headers
 #include <glad/glad.h>
 
@@ -18,27 +12,20 @@
 #include "VertexArray.hpp"
 #include "VertexBufferLayout.hpp"
 #include "IndexBuffer.hpp"
-
+#include "GlfwCallbacks.hpp"
 #include "Shader.hpp"
 #include "Object.hpp"
 #include "Render.hpp"
 #include "Model.hpp"
 #include "CameraController.hpp"
-
-// Imgui
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include "Gui.hpp"
+#include "Physics.hpp"
 
 // Include GLM
 #include <glm/glm.hpp>
 using namespace glm;
 
 // System Headers
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
-#include <btBulletDynamicsCommon.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -53,8 +40,6 @@ using namespace glm;
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <stdarg.h>
-#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
@@ -78,7 +63,7 @@ void getDeltaTime(){
 
     if ((currentTime - lastFrame) >= printTimer ){
         // printf and reset timer
-        printf("%f ms/frame\n", (printTimer*1000.0)/double(nbFrames));
+        //printf("%f ms/frame\n", (printTimer*1000.0)/double(nbFrames));
         nbFrames = 0;
         lastFrame += printTimer;
     }

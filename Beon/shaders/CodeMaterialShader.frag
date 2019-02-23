@@ -2,6 +2,7 @@
 out vec4 FragColor;
 
 struct Material {
+// This is without any texturing, just coloring
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;

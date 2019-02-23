@@ -2,12 +2,17 @@
 out vec4 FragColor;
 
 struct Material {
+// This is a textured material
     sampler2D diffuse;
     sampler2D specular;
+	sampler2D normal;
+	sampler2D height;
     float shininess;
 }; 
 
 struct DirLight {
+    bool On;
+
     vec3 direction;
     
     vec3 ambient;
@@ -16,6 +21,8 @@ struct DirLight {
 };
 
 struct PointLight {
+    bool On;
+
     vec3 position;
     
     float constant;
@@ -28,6 +35,8 @@ struct PointLight {
 };
 
 struct SpotLight {
+    bool On;
+
     vec3 position;
     vec3 direction;
     float cutOff;
@@ -71,15 +80,22 @@ void main()
     // per lamp. In the main() function we take all the calculated colors and sum them up for
     // this fragment's final color.
     // == =====================================================
-    // phase 1: directional lighting
-    vec3 result = CalcDirLight(dirLight, norm, viewDir);
-    // phase 2: point lights
+    vec3 result = vec3(1.0, 1.0, 1.0);
+
+    if(dirLight.On == true){
+        result = CalcDirLight(dirLight, norm, viewDir);
+    }
+
     for(int i = 0; i < NR_POINT_LIGHTS; i++)
-        result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
-    // phase 3: spot light
-    result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
+        if(pointLights[i].On == true){
+            result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
+        }
+    if(spotLight.On == true){
+        result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
+    }
     
     FragColor = vec4(result, 1.0);
+	FragColor = texture(material.diffuse, TexCoords);
 }
 
 // calculates the color when using a directional light.

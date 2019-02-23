@@ -13,9 +13,6 @@ class WindowManager{
 		GLFWwindow* getWindow();
 		int initWindow(std::string name = programName, int width = WINDOW_WIDTH, int height = WINDOW_HEIGHT);
 
-		void hideMouse(void);
-		void showMouse(void);
-
 		std::string mProgramName = programName;
 		int width = WINDOW_WIDTH;
 		int height = WINDOW_HEIGHT;
@@ -77,7 +74,7 @@ int WindowManager::initWindow(std::string name, int width, int height) {
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 	if (this->mouseVisable) {
-		// Hide the mouse and enable unlimited mouvement
+		// Hide the mouse and enable unlimited movement
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
     
@@ -118,15 +115,3 @@ WindowManager::WindowManager() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); 
 #endif
 }
-
-void WindowManager::showMouse(void) {
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	this->mouseVisable = true;
-}
-
-void WindowManager::hideMouse(void) {
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	this->mouseVisable = false;
-}
-
-

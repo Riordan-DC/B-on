@@ -13,8 +13,23 @@ Better shader class. With better logging.
 
 Better garbage collection and control.
 
+Do deferred rendering
 
+ECS (Entity component system) Give each entity an index that is mapped to a pointer of the entity.
 
+Right now we have alot of cache misses when looking for objects in the game world. 
+because OOP scatters "encapsulated" data across the heap. So we miss the cache a lot looking
+for data in the heap. This is why we need to focus on Data-Oriented design. You can still use C++
+but remember to focus and rewrite with DO design. 
+
+STICK TO A CODING STYLE SHEET OMG. MAKE IT RIGHT AWAY.
+
+vars		: some_variable
+const vars	: CONSTANT_VARIABLE
+functions	: some_function(void)
+classes		: Some_Class
+structs		: some_struct
+pointers	: type* name
 
 
 
