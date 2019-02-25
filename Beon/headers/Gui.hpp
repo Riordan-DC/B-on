@@ -7,9 +7,7 @@
 #include "imgui_impl_opengl3.h"
 
 // Shader data structures
-//#include "ShaderStructs.hpp"
-
-
+/*
 struct Material {
 	ImVec4 ambient;
 	ImVec4 diffuse;
@@ -40,6 +38,7 @@ struct PointLight {
 	ImVec4 diffuse;
 	ImVec4 specular;
 };
+*/
 
 namespace GUI {
 	// GUI stuff
@@ -50,17 +49,12 @@ namespace GUI {
 	bool show_demo_window = false;
 	bool show_another_window = false;
 
-	ImVec4 backgroundColor = ImVec4(1, 1, 1, 0);
+	ImVec4 backgroundColor = ImVec4(0, 0, 0, 0);
 
-	vector<Material> materials;
-	vector<DirLight> directionalLights;
-	vector<PointLight> pointLights;
-
-	
-	ImVec4 DirLightAmbientColor = ImVec4(1, 0.5f, 0.31f, 0.f);
+	ImVec4 DirLightAmbientColor = ImVec4(1.f, 1.f, 1.f, 0.f);
 	ImVec4 DirLightDirection = ImVec4(0.f, -1.f, 0.f, 0.f);
 	ImVec4 DirLightDiffuse = ImVec4(1.f, 1.f, 1.f, 0.f);
-	ImVec4 DirLightSpecular = ImVec4(0.5f, 0.5f, 0.5f, 0.f);
+	float DirLightSpecular = 0.5f;
 	float DirLightShininess = 32.f;
 }
 
@@ -95,14 +89,14 @@ void GUI::renderGui(void) {
 		ImGui::Begin("Beon Editor");
 
 		ImGui::Text("Beon");
-		ImGui::Checkbox("Bool example", &GUI::show_demo_window);
+		//ImGui::Checkbox("Bool example", &GUI::show_demo_window);
 
-		ImGui::ColorEdit3("background color", (float*)&GUI::backgroundColor);
-		ImGui::SliderFloat("global light shininess", &GUI::DirLightShininess, 0.0f, 100.0f);
-		ImGui::ColorEdit3("global light Ambient color", (float*)&GUI::DirLightAmbientColor);
-		ImGui::SliderFloat3("global light direction", (float*)&GUI::DirLightDirection, -1.0f, 1.0f);
-		ImGui::SliderFloat3("global light diffuse", (float*)&GUI::DirLightDiffuse, -1.0f, 1.0f);
-		ImGui::SliderFloat3("global light specular", (float*)&GUI::DirLightSpecular, -1.0f, 1.0f);
+		ImGui::ColorEdit3("Background color", (float*)&GUI::backgroundColor);
+		ImGui::SliderFloat("Global shininess", &GUI::DirLightShininess, 0.0f, 100.0f);
+		ImGui::ColorEdit3("Global ambient", (float*)&GUI::DirLightAmbientColor);
+		ImGui::SliderFloat3("Global direction", (float*)&GUI::DirLightDirection, -255.0f, 255.0f);
+		ImGui::SliderFloat3("Global diffuse", (float*)&GUI::DirLightDiffuse, 0.f, 10.0f);
+		ImGui::SliderFloat("Global specular", (float*)&GUI::DirLightSpecular, 0.f, 100.0f);
 
 		if (ImGui::Button("Button"))
 			counter++;

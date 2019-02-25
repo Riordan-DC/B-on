@@ -39,30 +39,27 @@ int main(int argc, char* argv[]) {
     Shader mCubmap = Shader("../Beon/shaders/CubeMap.vert", "../Beon/shaders/CubeMap.frag" );
 
 	// Load models
-    Model cube(GetCurrentWorkingDir()+"/../Beon/assets/models/cube.obj", false);
+    Model cube(GetCurrentWorkingDir()+"/../Beon/assets/models/cube.obj", true);
+	Model monkey(GetCurrentWorkingDir() + "/../Beon/assets/models/OBJ/Male_Casual.obj", false);
 	Model crysis_model(GetCurrentWorkingDir() + "/../Beon/assets/models/nanosuit/nanosuit.obj", false);
 
-    Model skybox;
-    skybox.LoadSkyBox(GetCurrentWorkingDir()+"/../Beon/assets/skybox");
+    //Model skybox;
+    //skybox.LoadSkyBox(GetCurrentWorkingDir()+"/../Beon/assets/skybox");
     mShader.use();
     mShader.setInt("skybox", 0);
 
-    mShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-    mShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-    mShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f); // specular lighting doesn't have full effect on this object's material
-    mShader.setFloat("material.shininess", 32.0f);
-
     mShader.setBool("dirLight.On", true);
+	crysis_shader.use();
 	crysis_shader.setBool("dirLight.On", true);
 
     mCubmap.use();
     mCubmap.setInt("skybox", 0);
 
-    Object crysis(crysis_model);
+    Object crysis(monkey);
     crysis.AddShader("texture", crysis_shader);
 
-    Object* static_cube = new Object(cube);
-	static_cube->AddShader("basic", mShader);
+    Object* static_cube = new Object(crysis_model);
+	static_cube->AddShader("basic", crysis_shader);
 
     //mShader.use();
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -108,44 +105,38 @@ int main(int argc, char* argv[]) {
         glClearColor(GUI::backgroundColor.x, GUI::backgroundColor.y, GUI::backgroundColor.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        MainView.Update(deltaTime);
-
-        MainView.UpdateShader(mShader);
-
-        mShader.setVec3("dirLight.direction", glm::vec3(GUI::DirLightDirection.x, GUI::DirLightDirection.y, GUI::DirLightDirection.z));
-        mShader.setVec3("dirLight.ambient", glm::vec3(GUI::DirLightAmbientColor.x, GUI::DirLightAmbientColor.y, GUI::DirLightAmbientColor.z));
-        mShader.setVec3("dirLight.diffuse", glm::vec3(GUI::DirLightDiffuse.x, GUI::DirLightDiffuse.y, GUI::DirLightDiffuse.z));
-        mShader.setVec3("dirLight.specular", glm::vec3(GUI::DirLightSpecular.x, GUI::DirLightSpecular.y, GUI::DirLightSpecular.z));
-		mShader.setFloat("dirLight.shininess", GUI::DirLightShininess);
-
-
-        // spotLight
-		/*
-        mShader.setBool("spotLight.On", false);
-        mShader.setVec3("spotLight.position", controlled_cam.camera->Position);
-        mShader.setVec3("spotLight.direction", controlled_cam.camera->Front);
-        mShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
-        mShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
-        mShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
-        mShader.setFloat("spotLight.constant", 1.0f);
-        mShader.setFloat("spotLight.linear", 0.09f);
-        mShader.setFloat("spotLight.quadratic", 0.032f);
-        mShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-        mShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f))); 
-		*/
-
-		static_cube->RenderObject(MainView);
-
+        MainView.Update();
 
 		MainView.UpdateShader(crysis_shader);
 
 		crysis_shader.setVec3("dirLight.direction", glm::vec3(GUI::DirLightDirection.x, GUI::DirLightDirection.y, GUI::DirLightDirection.z));
 		crysis_shader.setVec3("dirLight.ambient", glm::vec3(GUI::DirLightAmbientColor.x, GUI::DirLightAmbientColor.y, GUI::DirLightAmbientColor.z));
 		crysis_shader.setVec3("dirLight.diffuse", glm::vec3(GUI::DirLightDiffuse.x, GUI::DirLightDiffuse.y, GUI::DirLightDiffuse.z));
-		crysis_shader.setVec3("dirLight.specular", glm::vec3(GUI::DirLightSpecular.x, GUI::DirLightSpecular.y, GUI::DirLightSpecular.z));
+		crysis_shader.setVec3("dirLight.specular", glm::vec3(GUI::DirLightSpecular, GUI::DirLightSpecular, GUI::DirLightSpecular));
 		crysis_shader.setFloat("dirLight.shininess", GUI::DirLightShininess);
 
-		
+		crysis_shader.setBool("spotLight.On", true);
+		crysis_shader.setVec3("spotLight.position", controlled_cam.camera->Position);
+		crysis_shader.setVec3("spotLight.direction", controlled_cam.camera->Front);
+		crysis_shader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+		crysis_shader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+		crysis_shader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+		crysis_shader.setFloat("spotLight.constant", 1.0f);
+		crysis_shader.setFloat("spotLight.linear", 0.09f);
+		crysis_shader.setFloat("spotLight.quadratic", 0.032f);
+		crysis_shader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+		crysis_shader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+
+		crysis_shader.setBool("pointLights[0].On", true);
+		crysis_shader.setVec3("pointLights[0].position", controlled_cam.camera->Position);
+		crysis_shader.setVec3("pointLights[0].ambient", glm::vec3(GUI::DirLightAmbientColor.x, GUI::DirLightAmbientColor.y, GUI::DirLightAmbientColor.z));
+		crysis_shader.setVec3("pointLights[0].specular", glm::vec3(GUI::DirLightAmbientColor.x, GUI::DirLightAmbientColor.y, GUI::DirLightAmbientColor.z));
+		crysis_shader.setVec3("pointLights[0].diffuse", glm::vec3(GUI::DirLightAmbientColor.x, GUI::DirLightAmbientColor.y, GUI::DirLightAmbientColor.z));
+		crysis_shader.setFloat("pointLights[0].quadratic", 0.032f);
+		crysis_shader.setFloat("pointLights[0].linear", 0.09f);
+		crysis_shader.setFloat("pointLights[0].constant", 1.0f);
+
+		static_cube->RenderObject(MainView);
 		crysis.RenderObject(MainView);
 		
 

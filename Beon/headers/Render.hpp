@@ -18,7 +18,7 @@ public:
 		this->viewHeight = viewHeight;
 	}
 	
-	void Update(double deltaTime){
+	void Update(void){
 		this->camera->UpdateCamera(this->viewWidth, this->viewHeight);
 	}
 
@@ -31,6 +31,7 @@ public:
 
 	void UpdateShader(Shader shader){
 		shader.use();
+
         shader.setMat4("Projection", this->camera->ProjectionMatrix);
 
         shader.setMat4("View", this->camera->ViewMatrix);
@@ -40,6 +41,13 @@ public:
 
 	void UpdateShader(Shader shader, glm::mat4 &ModelMatrix){
 		shader.use();
+		
+		shader.setMat4("Projection", this->camera->ProjectionMatrix);
+
+		shader.setMat4("View", this->camera->ViewMatrix);
+
+		shader.setMat4("Model", ModelMatrix);
+
         glm::mat4 MVP = this->camera->ProjectionMatrix * this->camera->ViewMatrix * ModelMatrix;
         shader.setMat4("MVP", MVP);
 

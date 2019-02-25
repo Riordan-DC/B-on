@@ -14,11 +14,10 @@
 #include <btBulletDynamicsCommon.h>
 
 #include "Model.hpp"
-#include "Renderable.hpp"
 #include "Render.hpp"
 
 
-class Object: public Renderable{
+class Object {
 	public:
 		glm::mat4 ModelMatrix;
 		glm::vec3 Position;
@@ -27,6 +26,8 @@ class Object: public Renderable{
 		std::string name;
 
 		float mass;
+
+		bool visable;
 
 		Object(void);
 		Object(Model model);
@@ -40,12 +41,17 @@ class Object: public Renderable{
 		void ApplyForce(glm::vec3 force, glm::vec3 rel_pos);
 		void InitPhysics(btDiscreteDynamicsWorld* dynamicsWorld);
 		void SetScale(float scaleFactor);
+		void AddShader(std::string name, Shader _shader);
+		Shader* GetShader(std::string name);
 
 	private:
 		Model* ObjectModel;
 		btCollisionShape* boxCollisionShape;
 		btRigidBody* rigidBody;
 		btDefaultMotionState* motionstate;
+
+		std::map<std::string, Shader*> shaders;
+		Shader shader;
 
 		void LoadModel(std::string const &path);
 };

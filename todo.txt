@@ -12,6 +12,9 @@ define some strong assertions to prevent mistakes early on.
 Better shader class. With better logging.
 
 Better garbage collection and control.
+Use a better pointer than vanilla pointers so you dont lose track of memory.
+
+Impliment minmapping at texture loading. 
 
 Do deferred rendering
 

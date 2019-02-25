@@ -1,0 +1,22 @@
+
+
+On Puzzle Design
+----------------
+
+Hidden from me when I lack discipline:
+I saw the cover a book today, it was called "Statutory Interpretation".
+The cover of the book broke up the words into four letter words so I had
+to put these together in my head to find the right words. But this was not
+so easy because the four letter segments were obfuscated with cloud. So
+my brain had to interpret the four letter segments and piece them together
+correctly. This was a chicken or egg problem. I need to interpret the segments
+but they are blocked by cloud. Maybe the word wont make sense if I dont do this.
+Or perhaps if I know the word I can estimate the word and therefore, its segments, 
+better. I really liked this process and after reading just the title of a book, 
+I came away like I had discovered something hidden at a cursory glance. 
+
+Limits
+Any sort of first game I produce will be very simple. Limited to a single scene most
+likely. I was thinking about a game wherein you sit at a typewriter. You could solve 
+crimes at this desk and like vim you use keys to move between states like clicking
+keys and picking letters to read. 

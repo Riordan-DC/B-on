@@ -62,9 +62,11 @@ public:
         const char * fShaderCode = fragmentCode.c_str();
         // 2. compile shaders
         unsigned int vertex, fragment;
-        int success;
-        char infoLog[512];
-        // vertex shader
+        // Not sure when these following two variables were going to be used. 
+		//int success;
+        //char infoLog[512];
+        
+		// vertex shader
         vertex = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertex, 1, &vShaderCode, NULL);
         glCompileShader(vertex);
@@ -101,7 +103,7 @@ public:
     }
     // activate the shader
     void use() 
-    { 
+    {
         glUseProgram(ID); 
     }
     // utility uniform functions

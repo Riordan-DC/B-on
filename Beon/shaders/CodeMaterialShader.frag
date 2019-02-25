@@ -2,10 +2,16 @@
 out vec4 FragColor;
 
 struct Material {
-// This is without any texturing, just coloring
-    vec3 ambient;
+
+    sampler2D texture_diffuse;
+    sampler2D texture_specular;
+	sampler2D texture_normal;
+	sampler2D texture_height;
+	   
+	vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
     float shininess;
 }; 
 

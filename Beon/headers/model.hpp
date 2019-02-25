@@ -74,6 +74,8 @@ private:
         // retrieve the directory path of the filepath
         directory = path.substr(0, path.find_last_of('/'));
 
+		std::cout << "Loading model: " + directory << std::endl;
+
         // process ASSIMP's root node recursively
         processNode(scene->mRootNode, scene);
     }
@@ -104,6 +106,19 @@ private:
         vector<unsigned int> indices;
         vector<Texture> textures;
 
+		std::cout << "Mesh name: " << mesh->mName.C_Str() << std::endl;
+
+		aiMaterial* mat = scene->mMaterials[mesh->mMaterialIndex];
+		aiString mat_name;
+
+		// The generic way
+		if (AI_SUCCESS != mat->Get(AI_MATKEY_NAME, mat_name)) {
+			// handle epic failure here
+		}
+		else {
+			std::cout << "\tMaterial name: " << mat_name.C_Str() << std::endl;
+		}
+		
         // Walk through each of the mesh's vertices
         for(unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
@@ -128,20 +143,26 @@ private:
                 vec.x = mesh->mTextureCoords[0][i].x; 
                 vec.y = mesh->mTextureCoords[0][i].y;
                 vertex.TexCoords = vec;
+
+				// Only produce tangents with texture coordinates.
+				// tangent
+				vector.x = mesh->mTangents[i].x;
+				vector.y = mesh->mTangents[i].y;
+				vector.z = mesh->mTangents[i].z;
+				vertex.Tangent = vector;
+				// bitangent
+				vector.x = mesh->mBitangents[i].x;
+				vector.y = mesh->mBitangents[i].y;
+				vector.z = mesh->mBitangents[i].z;
+				vertex.Bitangent = vector;
+		
             }
-            else
-                vertex.TexCoords = glm::vec2(0.0f, 0.0f);
-            // tangent
-            vector.x = mesh->mTangents[i].x;
-            vector.y = mesh->mTangents[i].y;
-            vector.z = mesh->mTangents[i].z;
-            vertex.Tangent = vector;
-            // bitangent
-            vector.x = mesh->mBitangents[i].x;
-            vector.y = mesh->mBitangents[i].y;
-            vector.z = mesh->mBitangents[i].z;
-            vertex.Bitangent = vector;
-            vertices.push_back(vertex);
+			else {
+				// No texture coords, so give it a dummy.
+				vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+
+			}
+			vertices.push_back(vertex);
         }
         // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
         for(unsigned int i = 0; i < mesh->mNumFaces; i++)
@@ -174,7 +195,12 @@ private:
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
         
         // return a mesh object created from the extracted mesh data
-        return Mesh(vertices, indices, textures);
+		if (scene->HasMaterials()) {
+			return Mesh(vertices, indices, textures, material);
+		}
+		else {
+			return Mesh(vertices, indices, textures);
+		}
     }
 
     // checks all material textures of a given type and loads the textures if they're not loaded yet.

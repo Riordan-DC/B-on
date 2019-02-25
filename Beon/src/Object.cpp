@@ -11,6 +11,8 @@ Object::Object(Model model) {
 	this->Orientation = glm::quat(glm::vec3(0, 45, 0));
 	this->Scale = glm::scale(glm::vec3(1.0));
 	this->mass = 1.0;
+	this->visable = true;
+	this->shader = Shader();
 }
 
 Object::Object(std::string path) {
@@ -21,6 +23,8 @@ Object::Object(std::string path) {
 	this->Orientation = glm::quat(glm::vec3(0, 45, 0));
 	this->Scale = glm::scale(glm::vec3(1.0));
 	this->mass = 1.0;
+	this->visable = true;
+	this->shader = Shader();
 }
 
 Object::~Object(void) {
@@ -112,4 +116,13 @@ void Object::LoadModel(std::string const &path) {
 void Object::SetScale(float scaleFactor) {
 	this->boxCollisionShape->setLocalScaling(btVector3(scaleFactor, scaleFactor, scaleFactor));
 	this->Scale = glm::scale(glm::vec3(scaleFactor));
+}
+
+void Object::AddShader(std::string _name, Shader _shader) {
+	this->shaders[_name] = &_shader;
+	this->shader = _shader;
+}
+
+Shader* Object::GetShader(std::string _name) {
+	return this->shaders[_name];
 }

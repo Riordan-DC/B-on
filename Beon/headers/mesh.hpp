@@ -34,6 +34,22 @@ struct Texture {
     string path;
 };
 
+/* 
+	Assimp uses its only structure for managing material properties.
+	I am using glm to parse values to my shaders. So each draw call
+	I would have to convert from aiColor3D or whatever to the
+	appropriate type. This is slow so Im going to make a struct for
+	my mesh variables. Currently this material struct only contains
+	color values and no texture information.
+*/
+struct Material {
+	glm::vec3 diffuse;
+	glm::vec3 ambient;
+	glm::vec3 specular;
+
+	float shininess;
+};
+
 class Mesh {
 public:
     /*  Mesh Data  */
@@ -42,6 +58,10 @@ public:
     vector<Texture> textures;
     unsigned int VAO;
 
+	bool has_material;
+	aiMaterial* material;
+	Material material_color;
+
     /*  Functions  */
     // constructor
     Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
@@ -49,46 +69,87 @@ public:
         this->vertices = vertices;
         this->indices = indices;
         this->textures = textures;
+		this->has_material = false;
 
         // now that we have all the required data, set the vertex buffers and its attribute pointers.
         setupMesh();
     }
 
+	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures, aiMaterial* material)
+	{
+		this->vertices = vertices;
+		this->indices = indices;
+		this->textures = textures;
+
+		this->has_material = true;
+		this->material = material;
+
+		// Convert assimp material property types. This way I dont have to convert each frame.
+		// material variables
+		aiColor3D ambient;
+		aiColor3D diffuse;
+		aiColor3D specular;
+		float shininess;
+
+		// get material values
+		this->material->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
+		this->material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+		this->material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
+		this->material->Get(AI_MATKEY_SHININESS, shininess);
+
+		this->material_color = {
+			glm::vec3(ambient.r, ambient.g, ambient.b),
+			glm::vec3(diffuse.r, diffuse.g, diffuse.b),
+			glm::vec3(specular.r, specular.g, specular.b),
+			shininess
+		};
+		// now that we have all the required data, set the vertex buffers and its attribute pointers.
+		setupMesh();
+	}
+
     // render the mesh
     void Draw(Shader shader) 
     {
-        // bind appropriate textures
-        unsigned int diffuseNr  = 1;
-        unsigned int specularNr = 1;
-        unsigned int normalNr   = 1;
-        unsigned int heightNr   = 1;
-        for(unsigned int i = 0; i < textures.size(); i++)
-        {
-            glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
-            // retrieve texture number (the N in diffuse_textureN)
-            string number;
-            string name = textures[i].type;
-            if(name == "diffuse")
+		// bind appropriate textures
+		unsigned int diffuseNr = 1;
+		unsigned int specularNr = 1;
+		unsigned int normalNr = 1;
+		unsigned int heightNr = 1;
+		for (unsigned int i = 0; i < textures.size(); i++)
+		{
+			glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
+			// retrieve texture number (the N in diffuse_textureN)
+			string number;
+			string name = textures[i].type;
+			if (name == "texture_diffuse")
 				number = std::to_string(diffuseNr++);
-			else if(name == "specular")
+			else if (name == "texture_specular")
 				number = std::to_string(specularNr++); // transfer unsigned int to stream
-            else if(name == "normal")
+			else if (name == "texture_normal")
 				number = std::to_string(normalNr++); // transfer unsigned int to stream
-             else if(name == "height")
-			    number = std::to_string(heightNr++); // transfer unsigned int to stream
+			else if (name == "texture_height")
+				number = std::to_string(heightNr++); // transfer unsigned int to stream
 
-													 // now set the sampler to the correct texture unit
-			
-													 
+			// now set the sampler to the correct texture unit
+
+
 			//glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
-            glUniform1i(glGetUniformLocation(shader.ID, ("material." + name).c_str()), i);
-            // and finally bind the texture
-            glBindTexture(GL_TEXTURE_2D, textures[i].id);
-        }
-        
+			glUniform1i(glGetUniformLocation(shader.ID, ("material." + name).c_str()), i);
+			// and finally bind the texture
+			glBindTexture(GL_TEXTURE_2D, textures[i].id);
+		}
+
+        // set shader material color
+		if (this->has_material) {
+			shader.setVec3("material.ambient", this->material_color.ambient);
+			shader.setVec3("material.diffuse", this->material_color.diffuse);
+			shader.setVec3("material.specular", this->material_color.specular);
+			shader.setFloat("material.shininess", this->material_color.shininess);
+		}
+
         // draw mesh
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         // always good practice to set everything back to defaults once configured.

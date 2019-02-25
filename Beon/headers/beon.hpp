@@ -23,7 +23,7 @@
 
 // Include GLM
 #include <glm/glm.hpp>
-using namespace glm;
+using namespace glm; // Very naughty boy
 
 // System Headers
 #include <glm/glm.hpp>
