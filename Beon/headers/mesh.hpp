@@ -48,6 +48,11 @@ struct Material {
 	glm::vec3 specular;
 
 	float shininess;
+
+	bool hasNormalTexture;
+	bool hasDiffuseTexture;
+	bool hasSpecularTexture;
+	bool hasHeightTexture;
 };
 
 class Mesh {
@@ -59,7 +64,7 @@ public:
     unsigned int VAO;
 
 	bool has_material;
-	aiMaterial* material;
+	aiMaterial* material = NULL;
 	Material material_color;
 
     /*  Functions  */
@@ -80,9 +85,19 @@ public:
 		this->vertices = vertices;
 		this->indices = indices;
 		this->textures = textures;
-
 		this->has_material = true;
 		this->material = material;
+
+		aiString mat_name;
+
+		// The generic way
+		if (AI_SUCCESS != material->Get(AI_MATKEY_NAME, mat_name)) {
+			// handle epic failure here
+			std::cout << "\t[-] No material" << mat_name.C_Str() << std::endl;
+		}
+		else {
+			std::cout << "\tMaterial : " << mat_name.C_Str() << std::endl;
+		}
 
 		// Convert assimp material property types. This way I dont have to convert each frame.
 		// material variables
@@ -101,7 +116,11 @@ public:
 			glm::vec3(ambient.r, ambient.g, ambient.b),
 			glm::vec3(diffuse.r, diffuse.g, diffuse.b),
 			glm::vec3(specular.r, specular.g, specular.b),
-			shininess
+			shininess,
+			false,
+			false,
+			false,
+			false
 		};
 		// now that we have all the required data, set the vertex buffers and its attribute pointers.
 		setupMesh();
@@ -132,7 +151,6 @@ public:
 
 			// now set the sampler to the correct texture unit
 
-
 			//glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
 			glUniform1i(glGetUniformLocation(shader.ID, ("material." + name).c_str()), i);
 			// and finally bind the texture
@@ -140,13 +158,22 @@ public:
 		}
 
         // set shader material color
+		// Consider setting a drawn flag. Only call these once. 
 		if (this->has_material) {
 			shader.setVec3("material.ambient", this->material_color.ambient);
 			shader.setVec3("material.diffuse", this->material_color.diffuse);
 			shader.setVec3("material.specular", this->material_color.specular);
 			shader.setFloat("material.shininess", this->material_color.shininess);
 		}
+		shader.setBool("material.hasNormalTexture", this->material_color.hasNormalTexture);
+		shader.setBool("material.hasDiffuseTexture", this->material_color.hasDiffuseTexture);
+		shader.setBool("material.hasSpecularTexture", this->material_color.hasSpecularTexture);
+		shader.setBool("material.hasHeightTexture", this->material_color.hasHeightTexture);
 
+		//shader.setVec3("material.ambient", glm::vec3(0.5,0.5,0.5));
+		//shader.setVec3("material.diffuse", glm::vec3(0.5,0.5,0.5));
+		//shader.setVec3("material.specular", glm::vec3(0.5,0.5,0.5));
+		//shader.setFloat("material.shininess", 0.1f);
         // draw mesh
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
@@ -164,6 +191,19 @@ private:
     // initializes all the buffer objects/arrays
     void setupMesh()
     {
+		for (unsigned int i = 0; i < textures.size(); i++)
+		{
+			string name = textures[i].type;
+			if (name == "texture_diffuse")
+				this->material_color.hasDiffuseTexture = true;
+			else if (name == "texture_specular")
+				this->material_color.hasSpecularTexture = true;
+			else if (name == "texture_normal")
+				this->material_color.hasNormalTexture = true;
+			else if (name == "texture_height")
+				this->material_color.hasHeightTexture = true;
+		}
+
         // create buffers/arrays
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);

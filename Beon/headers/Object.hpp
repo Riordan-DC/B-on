@@ -25,13 +25,15 @@ class Object {
 		glm::mat4 Scale;
 		std::string name;
 
+		unsigned int entity_tag;
+
 		float mass;
 
 		bool visable;
 
-		Object(void);
-		Object(Model model);
-		Object(std::string path);
+		Object(unsigned int entity_tag);
+		Object(Model model, unsigned int entity_tag);
+		Object(std::string path, unsigned int entity_tag);
 		~Object(void);
 
 		void Update(float deltaTime);

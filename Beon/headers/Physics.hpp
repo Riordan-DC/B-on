@@ -1,6 +1,7 @@
 #include <btBulletDynamicsCommon.h>
 
 struct BulletSystem {
+	//btAlignedObjectArray<btCollisionShape*> m_collisionShapes;
 	btBroadphaseInterface* broadphase;
 	btDefaultCollisionConfiguration* collisionConfiguration;
 	btCollisionDispatcher* dispatcher;

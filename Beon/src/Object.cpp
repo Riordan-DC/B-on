@@ -1,9 +1,11 @@
 //World Object Class implementation
 #include "Object.hpp"
 
-Object::Object(void) {}
+Object::Object(unsigned int entity_tag) {
+	this->entity_tag = entity_tag;
+}
 
-Object::Object(Model model) {
+Object::Object(Model model, unsigned int entity_tag) {
 	this->ObjectModel = model.Clone();
 	this->ModelMatrix = glm::mat4(1.0);
 	this->Position = glm::vec3(0.0, 0.0, 0.0);
@@ -13,9 +15,10 @@ Object::Object(Model model) {
 	this->mass = 1.0;
 	this->visable = true;
 	this->shader = Shader();
+	this->entity_tag = entity_tag;
 }
 
-Object::Object(std::string path) {
+Object::Object(std::string path, unsigned int entity_tag) {
 	this->LoadModel(path);
 	this->ModelMatrix = glm::mat4(1.0);
 	this->Position = glm::vec3(0.0, 0.0, 0.0);
@@ -25,6 +28,7 @@ Object::Object(std::string path) {
 	this->mass = 1.0;
 	this->visable = true;
 	this->shader = Shader();
+	this->entity_tag = entity_tag;
 }
 
 Object::~Object(void) {
@@ -107,6 +111,7 @@ void Object::InitPhysics(btDiscreteDynamicsWorld* dynamicsWorld) {
 	quat.setEuler(31, 74, 10); //or quat.setEulerZYX depending on the ordering you want
 	tr.setRotation(quat);
 	this->rigidBody->setCenterOfMassTransform(tr);
+	this->rigidBody->setUserPointer((void*)this->entity_tag);
 }
 
 void Object::LoadModel(std::string const &path) {

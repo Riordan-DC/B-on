@@ -53,7 +53,7 @@ namespace GUI {
 
 	ImVec4 DirLightAmbientColor = ImVec4(1.f, 1.f, 1.f, 0.f);
 	ImVec4 DirLightDirection = ImVec4(0.f, -1.f, 0.f, 0.f);
-	ImVec4 DirLightDiffuse = ImVec4(1.f, 1.f, 1.f, 0.f);
+	float DirLightDiffuse = 1.0f;
 	float DirLightSpecular = 0.5f;
 	float DirLightShininess = 32.f;
 }
@@ -92,11 +92,11 @@ void GUI::renderGui(void) {
 		//ImGui::Checkbox("Bool example", &GUI::show_demo_window);
 
 		ImGui::ColorEdit3("Background color", (float*)&GUI::backgroundColor);
-		ImGui::SliderFloat("Global shininess", &GUI::DirLightShininess, 0.0f, 100.0f);
+		ImGui::SliderFloat("Global shininess", &GUI::DirLightShininess, 0.0f, 1.0f);
 		ImGui::ColorEdit3("Global ambient", (float*)&GUI::DirLightAmbientColor);
-		ImGui::SliderFloat3("Global direction", (float*)&GUI::DirLightDirection, -255.0f, 255.0f);
-		ImGui::SliderFloat3("Global diffuse", (float*)&GUI::DirLightDiffuse, 0.f, 10.0f);
-		ImGui::SliderFloat("Global specular", (float*)&GUI::DirLightSpecular, 0.f, 100.0f);
+		ImGui::SliderFloat3("Global direction", (float*)&GUI::DirLightDirection, -1.0f, 1.0f);
+		ImGui::SliderFloat("Global diffuse", &GUI::DirLightDiffuse, 0.f, 10.0f);
+		ImGui::SliderFloat("Global specular", &GUI::DirLightSpecular, 0.f, 10.0f);
 
 		if (ImGui::Button("Button"))
 			counter++;

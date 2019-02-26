@@ -105,19 +105,8 @@ private:
         vector<Vertex> vertices;
         vector<unsigned int> indices;
         vector<Texture> textures;
-
-		std::cout << "Mesh name: " << mesh->mName.C_Str() << std::endl;
-
-		aiMaterial* mat = scene->mMaterials[mesh->mMaterialIndex];
-		aiString mat_name;
-
-		// The generic way
-		if (AI_SUCCESS != mat->Get(AI_MATKEY_NAME, mat_name)) {
-			// handle epic failure here
-		}
-		else {
-			std::cout << "\tMaterial name: " << mat_name.C_Str() << std::endl;
-		}
+		
+		std::cout << "Mesh : " << mesh->mName.C_Str() << std::endl;
 		
         // Walk through each of the mesh's vertices
         for(unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -172,15 +161,10 @@ private:
             for(unsigned int j = 0; j < face.mNumIndices; j++)
                 indices.push_back(face.mIndices[j]);
         }
-        // process materials
-        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];    
-        // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-        // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
-        // Same applies to other texture as the following list summarizes:
-        // diffuse: texture_diffuseN
-        // specular: texture_specularN
-        // normal: texture_normalN
-
+        
+		// process materials
+        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+		
         // 1. diffuse maps
         vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());

@@ -12,7 +12,12 @@ struct Material {
     vec3 specular;
 
     float shininess;
-}; 
+
+	bool hasNormalTexture;
+	bool hasDiffuseTexture;
+	bool hasSpecularTexture;
+	bool hasHeightTexture;
+};
 
 struct DirLight {
     bool On;
@@ -75,7 +80,15 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 void main()
 {    
     // properties
-    vec3 norm = normalize(Normal);
+	// Calculate normal. If a normal map exists, sample it instead.
+	vec3 norm;
+	if (material.hasNormalTexture) {
+		norm = normalize(texture(material.texture_normal, TexCoords).xyz);
+	}
+	else {
+		norm = normalize(Normal);
+	}
+    // Calculate the vector from the camera position to the fragment.
     vec3 viewDir = normalize(cameraPos - FragPos);
     
     // == =====================================================
@@ -84,16 +97,17 @@ void main()
     // per lamp. In the main() function we take all the calculated colors and sum them up for
     // this fragment's final color.
     // == =====================================================
-    vec3 result = vec3(0, 0, 0);
+    vec3 result = vec3(0,0,0);
 
 	if(dirLight.On == true){
 		result = CalcDirLight(dirLight, norm, viewDir);
 	}
     
-	for(int i = 0; i < NR_POINT_LIGHTS; i++)
-		if(pointLights[i].On == true){
+	for(int i = 0; i < NR_POINT_LIGHTS; i++) {
+		if(pointLights[i].On == true) {
 			result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
 		}
+	}
     
 	if(spotLight.On == true){
 		result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
@@ -104,17 +118,17 @@ void main()
 // calculates the color when using a directional light.
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 {
-    vec3 lightDir = normalize(-light.direction);
+    vec3 lightDir = normalize(light.direction);
     // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
+    float diff = max(dot(normal, viewDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     // combine results
-    vec3 ambient = light.ambient * material.ambient * texture(material.texture_diffuse, TexCoords).xyz;
-    vec3 diffuse = light.diffuse * (diff * material.diffuse * texture(material.texture_diffuse, TexCoords).xyz);
-    vec3 specular = light.specular * (spec * material.specular) * texture(material.texture_specular, TexCoords).xyz;
-    return (ambient + diffuse + specular);
+	vec3 ambient = light.ambient * material.ambient * texture(material.texture_diffuse, TexCoords).xyz;
+	vec3 diffuse = light.diffuse * (diff * material.diffuse * texture(material.texture_diffuse, TexCoords).xyz);
+	vec3 specular = light.specular * (spec * material.specular) * texture(material.texture_specular, TexCoords).xyz;
+	return (ambient + diffuse + specular);
 }
 
 
