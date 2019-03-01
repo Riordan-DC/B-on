@@ -48,6 +48,9 @@ public:
     glm::mat4 ProjectionMatrix;
     glm::mat4 ViewMatrix;
 
+	float FarClippingDistance = 300.0f;
+	float NearClippingDistance = 0.1f;
+
     // Constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
     {
@@ -77,13 +80,10 @@ public:
 
     void UpdateCamera(int SCR_WIDTH, int SCR_HEIGHT)
     {
-        this->ProjectionMatrix = glm::perspective(glm::radians(this->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 50.0f);
-        //shader.setMat4("Projection", ProjectionMatrix);
-
+        this->ProjectionMatrix = glm::perspective(glm::radians(this->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, this->NearClippingDistance, this->FarClippingDistance);
         this->ViewMatrix = this->GetViewMatrix();
-        //shader.setMat4("View", ViewMatrix);
 
-        //shader.setVec3("cameraPos", this->Position);
+		// If operating without a wrapper class this is where you might pass the view and proj matracies to the shader. 
     }
 
     void UpdateCamera(Shader &shader, glm::mat4 ModelMatrix, int SCR_WIDTH, int SCR_HEIGHT)

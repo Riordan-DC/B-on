@@ -21,7 +21,6 @@ public:
 	bool firstMouse;
 	double lastX, lastY;
 	bool trackMouse;
-
 };
 
 #endif

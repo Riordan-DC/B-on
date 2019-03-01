@@ -76,10 +76,22 @@ void Object::Update(float deltaTime) {
 }
 
 void Object::RenderObject(Render &render) {
-	render.UpdateShader(this->shader);
-	this->shader.use();
-	this->shader.setMat4("Model", this->ModelMatrix);
-	this->ObjectModel->Draw(this->shader);
+	if (this->visable) {
+		if (this->selected) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glDisable(GL_CULL_FACE);
+		}
+
+		render.UpdateShader(this->shader);
+		this->shader.use();
+		this->shader.setMat4("Model", this->ModelMatrix);
+		this->ObjectModel->Draw(this->shader);
+
+		if (this->selected) {
+			glEnable(GL_CULL_FACE);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+	}
 }
 
 void Object::SetPosition(glm::vec3 pos) {
@@ -111,16 +123,16 @@ void Object::InitPhysics(btDiscreteDynamicsWorld* dynamicsWorld) {
 	quat.setEuler(31, 74, 10); //or quat.setEulerZYX depending on the ordering you want
 	tr.setRotation(quat);
 	this->rigidBody->setCenterOfMassTransform(tr);
-	this->rigidBody->setUserPointer((void*)this->entity_tag);
+	this->rigidBody->setUserPointer((void*)this);
 }
 
 void Object::LoadModel(std::string const &path) {
 	this->ObjectModel = new Model(path, false);
 }
 
-void Object::SetScale(float scaleFactor) {
-	this->boxCollisionShape->setLocalScaling(btVector3(scaleFactor, scaleFactor, scaleFactor));
-	this->Scale = glm::scale(glm::vec3(scaleFactor));
+void Object::SetScale(glm::vec3 scale) {
+	this->boxCollisionShape->setLocalScaling(btVector3(scale.x, scale.y, scale.z));
+	this->Scale = glm::scale(scale);
 }
 
 void Object::AddShader(std::string _name, Shader _shader) {
@@ -130,4 +142,8 @@ void Object::AddShader(std::string _name, Shader _shader) {
 
 Shader* Object::GetShader(std::string _name) {
 	return this->shaders[_name];
+}
+
+void Object::Selected(bool selected) {
+	this->selected = selected;
 }

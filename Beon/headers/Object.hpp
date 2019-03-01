@@ -29,7 +29,8 @@ class Object {
 
 		float mass;
 
-		bool visable;
+		bool visable = true;
+		bool selected = false;
 
 		Object(unsigned int entity_tag);
 		Object(Model model, unsigned int entity_tag);
@@ -42,8 +43,9 @@ class Object {
 		void Translate(glm::vec3 pos);
 		void ApplyForce(glm::vec3 force, glm::vec3 rel_pos);
 		void InitPhysics(btDiscreteDynamicsWorld* dynamicsWorld);
-		void SetScale(float scaleFactor);
+		void SetScale(glm::vec3 scale);
 		void AddShader(std::string name, Shader _shader);
+		void Selected(bool selected);
 		Shader* GetShader(std::string name);
 
 	private:

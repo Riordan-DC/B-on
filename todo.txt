@@ -7,14 +7,8 @@ pointer and allow  for infinite movement.
 
 Build logging system. Add more logging states.
 
-define some strong assertions to prevent mistakes early on.
-
-Better shader class. With better logging.
-
 Better garbage collection and control.
 Use a better pointer than vanilla pointers so you dont lose track of memory.
-
-Impliment minmapping at texture loading. 
 
 Do deferred rendering
 
@@ -25,24 +19,12 @@ because OOP scatters "encapsulated" data across the heap. So we miss the cache a
 for data in the heap. This is why we need to focus on Data-Oriented design. You can still use C++
 but remember to focus and rewrite with DO design. 
 
-STICK TO A CODING STYLE SHEET OMG. MAKE IT RIGHT AWAY.
-
-vars		: some_variable
-const vars	: CONSTANT_VARIABLE
-functions	: some_function(void)
-classes		: Some_Class
-structs		: some_struct
-pointers	: type* name
-
-
-
-
 future dependents
 
 - assimp(mesh loader)
 - bullet (physics engine)
 - glad (opengl function loader)
-- std (texture loader)
+- stb_image (texture loader)
 - glfw (window/input control)
 - glm (linear algebra)
 - imgui (gui)

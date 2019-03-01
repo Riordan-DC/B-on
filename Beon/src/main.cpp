@@ -3,10 +3,13 @@
 #include "Raycast.hpp"
 
 // Window parameters
-int windowWidth = 1980 - 300;
-int windowHeight = 1080 - 300;
+int windowWidth = 1980;
+int windowHeight = 1080;
 
 static bool running = true;
+
+//Get a handle on our light
+//GLuint LightID = glGetUniformLocation(mShader.ID, "LightPosition_worldspace");
 
 // Forward declaration of functions
 void cleanup();
@@ -41,9 +44,11 @@ int main(int argc, char* argv[]) {
 	Shader mCubmap = Shader("../Beon/shaders/CubeMap.vert", "../Beon/shaders/CubeMap.frag" );
 
 	// Load models
-    Model monkey_model(GetCurrentWorkingDir()+"/../Beon/assets/models/suzanne/suzanne.obj", false);
-	Model man_model(GetCurrentWorkingDir() + "/../Beon/assets/models/people/Male_Casual.obj", false);
-	Model crysis_model(GetCurrentWorkingDir() + "/../Beon/assets/models/nanosuit/nanosuit.obj", false);
+    //Model monkey_model(GetCurrentWorkingDir()+"/../Beon/assets/models/suzanne/suzanne.obj", false);
+	//Model man_model(GetCurrentWorkingDir() + "/../Beon/assets/models/people/Male_Casual.obj", false);
+	//Model crysis_model(GetCurrentWorkingDir() + "/../Beon/assets/models/nanosuit/nanosuit.obj", false);
+	Model floor_model(GetCurrentWorkingDir() + "/../Beon/assets/models/cube/cube.obj", false);
+
 
     Model skybox;
     skybox.LoadSkyBox(GetCurrentWorkingDir()+"/../Beon/assets/skybox");
@@ -51,35 +56,38 @@ int main(int argc, char* argv[]) {
     mCubmap.use();
     mCubmap.setInt("skybox", 0);
 
-    Object crysis(crysis_model, 0);
+    Object crysis(floor_model, 0);
     crysis.AddShader("texture", crysis_shader);
 
-    Object* monkey = new Object(monkey_model, 1);
+    Object* monkey = new Object(floor_model, 1);
 	monkey->AddShader("basic", crysis_shader);
 
-	Object* man = new Object(man_model, 2);
+	Object* man = new Object(floor_model, 562);
 	man->AddShader("material", crysis_shader);
 
-    //mShader.use();
+	Object* floor = new Object(floor_model, 30000);
+	floor->AddShader("material", crysis_shader);
+
+    //crysis_shader.use();
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//Get a handle on our light
-    //GLuint LightID = glGetUniformLocation(mShader.ID, "LightPosition_worldspace");
-	
+
 	BulletSystem bulletSystem = StartBulletPhysics();
 
-	bulletSystem.dynamicsWorld->setGravity(btVector3(0,-5.1f,0));
+	bulletSystem.dynamicsWorld->setGravity(btVector3(0,-5.1,0));
 
-    crysis.mass = 10.0;
+    crysis.mass = 1.0;
     crysis.InitPhysics(bulletSystem.dynamicsWorld);
-    crysis.SetPosition(glm::vec3(0.0,10.0,0.0));
-    crysis.ApplyForce(glm::vec3(0.0,30.0,0.0), glm::vec3(0.0,5.0,0.0));
-
-	man->mass = 0.0;
+    crysis.SetPosition(glm::vec3(0.0,40.0,0.0));
+	man->mass = 1.0;
 	man->InitPhysics(bulletSystem.dynamicsWorld);
-	man->SetPosition(glm::vec3(0.0, -20.0,0.0));
-	monkey->mass = 0.0;
+	man->SetPosition(glm::vec3(0.0, 70.0,0.0));
+	monkey->mass = 1.0;
 	monkey->InitPhysics(bulletSystem.dynamicsWorld);
-	monkey->SetPosition(glm::vec3(-3.0, -20.0, 0.0));
+	monkey->SetPosition(glm::vec3(0.f, 90.0, 0.0));
+	floor->mass = 0.0;
+	floor->InitPhysics(bulletSystem.dynamicsWorld);
+	floor->SetPosition(glm::vec3(0.0, 0.0, 0.0));
+	floor->SetScale(glm::vec3(1,10,10));
 
 	double lastTime = glfwGetTime();
     // Game Loop //
@@ -90,15 +98,15 @@ int main(int argc, char* argv[]) {
 		getDeltaTime();
 
 		// UPDATE
-		controlled_cam.Update(deltaTime);
 		bulletSystem.dynamicsWorld->stepSimulation(
 			deltaTime,						// Time since last step
-			1,								// Mas substep count
+			7,								// Mas substep count
 			btScalar(1.) / btScalar(60.));	// Fixed time step 
 
 		crysis.Update(deltaTime);
 		man->Update(deltaTime);
 		monkey->Update(deltaTime);
+		floor->Update(deltaTime);
 
 
 		// RENDER
@@ -111,27 +119,14 @@ int main(int argc, char* argv[]) {
 
 		MainView.UpdateShader(crysis_shader);
 
-		crysis_shader.setBool("dirLight.On", false);
-
+		crysis_shader.setBool("dirLight.On", true);
 		crysis_shader.setVec3("dirLight.direction", glm::vec3(GUI::DirLightDirection.x, GUI::DirLightDirection.y, GUI::DirLightDirection.z));
 		crysis_shader.setVec3("dirLight.ambient", glm::vec3(GUI::DirLightAmbientColor.x, GUI::DirLightAmbientColor.y, GUI::DirLightAmbientColor.z));
 		crysis_shader.setVec3("dirLight.diffuse", glm::vec3(GUI::DirLightDiffuse, GUI::DirLightDiffuse, GUI::DirLightDiffuse));
 		crysis_shader.setVec3("dirLight.specular", glm::vec3(GUI::DirLightSpecular, GUI::DirLightSpecular, GUI::DirLightSpecular));
 		crysis_shader.setFloat("dirLight.shininess", GUI::DirLightShininess);
 
-		crysis_shader.setBool("spotLight.On", false);
-		crysis_shader.setVec3("spotLight.position", controlled_cam.camera->Position);
-		crysis_shader.setVec3("spotLight.direction", controlled_cam.camera->Front);
-		crysis_shader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
-		crysis_shader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
-		crysis_shader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
-		crysis_shader.setFloat("spotLight.constant", 1.0f);
-		crysis_shader.setFloat("spotLight.linear", 0.09f);
-		crysis_shader.setFloat("spotLight.quadratic", 0.032f);
-		crysis_shader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-		crysis_shader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
-
-		crysis_shader.setBool("pointLights[0].On", true);
+		crysis_shader.setBool("pointLights[0].On", false);
 		crysis_shader.setVec3("pointLights[0].position", controlled_cam.camera->Position);
 		crysis_shader.setVec3("pointLights[0].ambient", glm::vec3(GUI::DirLightAmbientColor.x, GUI::DirLightAmbientColor.y, GUI::DirLightAmbientColor.z));
 		crysis_shader.setVec3("pointLights[0].specular", glm::vec3(GUI::DirLightSpecular, GUI::DirLightSpecular, GUI::DirLightSpecular));
@@ -143,35 +138,55 @@ int main(int argc, char* argv[]) {
 		crysis.RenderObject(MainView);
 		man->RenderObject(MainView);
 		monkey->RenderObject(MainView);
+		floor->RenderObject(MainView);
 
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) {
 
 
 			glm::vec3 out_origin;
 			glm::vec3 out_direction;
+			double xpos, ypos;
+			if (controlled_cam.trackMouse) {
+				xpos = windowWidth / 2;
+				ypos = windowHeight / 2;
+			}
+			else {
+				glfwGetCursorPos(window, &xpos, &ypos);
+				ypos = windowHeight - ypos;
+			}
+			std::cout << "xpos : " << xpos << " ypos : " << ypos << std::endl;
 			ScreenPosToWorldRay(
-				1024 / 2, 768 / 2,
+				(int)xpos, (int)ypos,
 				windowWidth, windowHeight,
 				controlled_cam.camera->ViewMatrix,
 				controlled_cam.camera->ProjectionMatrix,
 				out_origin,
 				out_direction
 			);
-
 			glm::vec3 out_end = out_origin + out_direction * 1000.0f;
 
 			btCollisionWorld::ClosestRayResultCallback RayCallback(btVector3(out_origin.x, out_origin.y, out_origin.z), btVector3(out_end.x, out_end.y, out_end.z));
 			bulletSystem.dynamicsWorld->rayTest(btVector3(out_origin.x, out_origin.y, out_origin.z), btVector3(out_end.x, out_end.y, out_end.z), RayCallback);
 			if (RayCallback.hasHit()) {
-				std::cout << "mesh " << (size_t)RayCallback.m_collisionObject->getUserPointer() << std::endl;
+				if (GUI::selected_object) {
+					GUI::selected_object->Selected(false);
+				}
+				GUI::selected_object = (Object*)RayCallback.m_collisionObject->getUserPointer();
+				GUI::selected_object->Selected(true);
+				std::cout << "mesh " << GUI::selected_object->entity_tag << std::endl;
 			}
 			else {
 				std::cout << "background" << std::endl;;
 			}
-
-
 		}
-		
+
+		controlled_cam.Update(deltaTime);
+		if (controlled_cam.trackMouse) {
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		}
+		else {
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
 
         glDepthFunc(GL_LEQUAL);
         MainView.UpdateShader(mCubmap);
@@ -195,6 +210,7 @@ int main(int argc, char* argv[]) {
     // de-allocate all resources once they've outlived their purpose:
 	delete man;
 	delete monkey;
+	delete floor;
 
 	GUI::killGui();
 

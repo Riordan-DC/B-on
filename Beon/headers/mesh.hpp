@@ -157,7 +157,7 @@ public:
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
 		}
 
-        // set shader material color
+		// set shader material color
 		// Consider setting a drawn flag. Only call these once. 
 		if (this->has_material) {
 			shader.setVec3("material.ambient", this->material_color.ambient);
@@ -170,17 +170,13 @@ public:
 		shader.setBool("material.hasSpecularTexture", this->material_color.hasSpecularTexture);
 		shader.setBool("material.hasHeightTexture", this->material_color.hasHeightTexture);
 
-		//shader.setVec3("material.ambient", glm::vec3(0.5,0.5,0.5));
-		//shader.setVec3("material.diffuse", glm::vec3(0.5,0.5,0.5));
-		//shader.setVec3("material.specular", glm::vec3(0.5,0.5,0.5));
-		//shader.setFloat("material.shininess", 0.1f);
-        // draw mesh
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+		// draw mesh
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
 
-        // always good practice to set everything back to defaults once configured.
-        glActiveTexture(GL_TEXTURE0);
+		// always good practice to set everything back to defaults once configured.
+		glActiveTexture(GL_TEXTURE0);
     }
 
 private:

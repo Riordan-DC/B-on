@@ -41,7 +41,6 @@ public:
     bool gammaCorrection;
     SkyBox skybox;
 
-
     /*  Functions   */
     Model();
 

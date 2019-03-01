@@ -12,29 +12,28 @@ CameraController::~CameraController() {
 }
 
 void CameraController::Update(double deltaTime) {
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		this->camera->ProcessKeyboard(FORWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		this->camera->ProcessKeyboard(BACKWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		this->camera->ProcessKeyboard(LEFT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		this->camera->ProcessKeyboard(RIGHT, deltaTime);
-
-
 	if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
 		// Tab has been pressed. Stop tracking the mouse and disable infinite movement.
 		if (this->trackMouse) { 
 			this->trackMouse = false;
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		}
 		else {
 			this->trackMouse = true;
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		}
 		
 
 	if (this->trackMouse) {
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			this->camera->ProcessKeyboard(FORWARD, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			this->camera->ProcessKeyboard(BACKWARD, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			this->camera->ProcessKeyboard(LEFT, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			this->camera->ProcessKeyboard(RIGHT, deltaTime);
+
 		glfwGetCursorPos(this->window, &this->xpos, &this->ypos);
 
 		if (this->firstMouse)
