@@ -6,13 +6,13 @@
 #include "camera.hpp"
 #include "Shader.hpp"
 
-class Render{
+class Renderer{
 public:
 	Camera* camera;
 	int viewWidth;
 	int viewHeight;
 
-	Render(Camera *camera, int viewWidth, int viewHeight){
+	Renderer(Camera *camera, int viewWidth, int viewHeight){
 		this->camera = camera;
 		this->viewWidth = viewWidth;
 		this->viewHeight = viewHeight;

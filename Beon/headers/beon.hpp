@@ -15,7 +15,8 @@
 #include "GlfwCallbacks.hpp"
 #include "Shader.hpp"
 #include "Object.hpp"
-#include "Render.hpp"
+#include "Renderer.hpp"
+#include "Raycast.hpp"
 #include "Model.hpp"
 #include "CameraController.hpp"
 #include "Gui.hpp"
@@ -69,8 +70,7 @@ void getDeltaTime(){
     }
 }
 
-#define WINDOWS  /* uncomment this line to use it for windows. Comment it to use for MacOS */ 
-#ifdef WINDOWS
+#ifdef WIN32
 #include <direct.h>
 #define GetCurrentDir _getcwd
 #else

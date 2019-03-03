@@ -26,6 +26,7 @@ namespace GUI {
 	float DirLightShininess = 32.f;
 
 	bool p_open;
+	bool fly_camera;
 
 	Object* selected_object = NULL;
 	ImVec4 selected_object_pos = ImVec4(0, 0, 0, 0);
@@ -62,6 +63,8 @@ void GUI::renderGui(void) {
 		ImGui::Begin("Beon Editor", &GUI::p_open, window_flags);
 
 		ImGui::Text("Beon (v0.1)");
+		if (ImGui::Button("Fly Camera"))
+			GUI::fly_camera = true;
 		// Menu
 		if (ImGui::BeginMenuBar())
 		{

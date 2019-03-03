@@ -10,9 +10,9 @@ Object::Object(Model model, unsigned int entity_tag) {
 	this->ModelMatrix = glm::mat4(1.0);
 	this->Position = glm::vec3(0.0, 0.0, 0.0);
 	this->boxCollisionShape = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));
-	this->Orientation = glm::quat(glm::vec3(0, 45, 0));
+	this->Orientation = glm::quat(glm::vec3(0, 0, 0));
 	this->Scale = glm::scale(glm::vec3(1.0));
-	this->mass = 1.0;
+	this->mass = 0.0;
 	this->visable = true;
 	this->shader = Shader();
 	this->entity_tag = entity_tag;
@@ -22,10 +22,10 @@ Object::Object(std::string path, unsigned int entity_tag) {
 	this->LoadModel(path);
 	this->ModelMatrix = glm::mat4(1.0);
 	this->Position = glm::vec3(0.0, 0.0, 0.0);
-	this->boxCollisionShape = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f)); //Future: We want to load an object collision model. 
+	this->boxCollisionShape = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f)); //@TODO: We want to load an object collision model. 
 	this->Orientation = glm::quat(glm::vec3(0, 45, 0));
 	this->Scale = glm::scale(glm::vec3(1.0));
-	this->mass = 1.0;
+	this->mass = 0.0;
 	this->visable = true;
 	this->shader = Shader();
 	this->entity_tag = entity_tag;
@@ -75,7 +75,7 @@ void Object::Update(float deltaTime) {
 	this->ModelMatrix = glm::translate(glm::mat4(1.0), this->Position) * glm::toMat4(this->Orientation) * this->Scale;
 }
 
-void Object::RenderObject(Render &render) {
+void Object::RenderObject(Renderer &render) {
 	if (this->visable) {
 		if (this->selected) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -107,7 +107,7 @@ void Object::ApplyForce(glm::vec3 force, glm::vec3 rel_pos) {
 	this->rigidBody->applyForce(btVector3(force.x, force.y, force.z), btVector3(rel_pos.x, rel_pos.y, rel_pos.z));
 }
 
-void Object::InitPhysics(btDiscreteDynamicsWorld* dynamicsWorld) {
+btRigidBody* Object::InitPhysics(btDiscreteDynamicsWorld* dynamicsWorld) {
 	this->motionstate = new btDefaultMotionState(
 		btTransform(btQuaternion(this->Orientation.x, this->Orientation.y, this->Orientation.z, this->Orientation.w),
 			btVector3(this->Position.x, this->Position.y, this->Position.z)));
@@ -124,6 +124,7 @@ void Object::InitPhysics(btDiscreteDynamicsWorld* dynamicsWorld) {
 	tr.setRotation(quat);
 	this->rigidBody->setCenterOfMassTransform(tr);
 	this->rigidBody->setUserPointer((void*)this);
+	return this->rigidBody;
 }
 
 void Object::LoadModel(std::string const &path) {

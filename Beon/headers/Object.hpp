@@ -14,7 +14,7 @@
 #include <btBulletDynamicsCommon.h>
 
 #include "Model.hpp"
-#include "Render.hpp"
+#include "Renderer.hpp"
 
 
 class Object {
@@ -38,11 +38,11 @@ class Object {
 		~Object(void);
 
 		void Update(float deltaTime);
-		void RenderObject(Render &render);
+		void RenderObject(Renderer &render);
 		void SetPosition(glm::vec3 pos);
 		void Translate(glm::vec3 pos);
 		void ApplyForce(glm::vec3 force, glm::vec3 rel_pos);
-		void InitPhysics(btDiscreteDynamicsWorld* dynamicsWorld);
+		btRigidBody* InitPhysics(btDiscreteDynamicsWorld* dynamicsWorld);
 		void SetScale(glm::vec3 scale);
 		void AddShader(std::string name, Shader _shader);
 		void Selected(bool selected);
@@ -59,10 +59,5 @@ class Object {
 
 		void LoadModel(std::string const &path);
 };
-
-	// Small hack : store the mesh's index "i" in Bullet's User Pointer.
-	// Will be used to know which object is picked. 
-	// A real program would probably pass a "MyGameObjectPointer" instead.
-	//rigidBody->setUserPointer((void*)this);
 
 #endif
